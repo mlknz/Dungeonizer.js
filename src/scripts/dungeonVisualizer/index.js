@@ -163,7 +163,6 @@ window.dungeonizer.visualize = function(renderer) {
         resize: function(width, height) {
             Config.aspectRatio = width / height;
             if (camera.aspect !== Config.aspectRatio) {
-                console.log('QQ');
                 camera.aspect = Config.aspectRatio;
                 camera.updateProjectionMatrix();
             }
