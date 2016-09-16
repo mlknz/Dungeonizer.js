@@ -3,8 +3,16 @@ require('three/examples/js/controls/OrbitControls.js');
 
 class Controls {
     constructor(camera, domElement) {
-        const oc = new THREE.OrbitControls(camera, domElement);
-        console.log(oc);
+        this.orbitControls = new THREE.OrbitControls(camera, domElement);
+        this.orbitControls.enableDamping = true;
+    }
+
+    update() {
+        this.orbitControls.update();
+    }
+
+    dispose() {
+        this.orbitControls.dispose();
     }
 }
 

@@ -1,14 +1,12 @@
-console.warn('In generator');
-
 if (module.hot) {
     module.hot.accept();
 }
 
-var Delaunay = require('./delaunay.js');
+const Delaunay = require('./delaunay.js');
 
 function isCollided(a, b) {
     if (a.x - a.w / 2 < b.x + b.w / 2 && a.x + a.w / 2 > b.x - b.w / 2 &&
-        a.y + a.h / 2 > b.y - b.h / 2 && a.y - a.h / 2 < b.y + b.h / 2 ) return true;
+        a.y + a.h / 2 > b.y - b.h / 2 && a.y - a.h / 2 < b.y + b.h / 2) return true;
 
     return false;
 }
@@ -33,11 +31,11 @@ function dSq(a, b) {
 
 function diveSearch(v, b, gVerts, visited) {
     visited.push(v);
-    var wasThere = false;
-    var found = false;
+    let wasThere = false;
+    let found = false;
 
-    for (var i = 0; i < gVerts[v].length; i++) {
-        for (var k = 0; k < visited.length; k++) {
+    for (let i = 0; i < gVerts[v].length; i++) {
+        for (let k = 0; k < visited.length; k++) {
             if (gVerts[v][i] === b) {
                 found = true;
                 break;
@@ -54,9 +52,9 @@ function diveSearch(v, b, gVerts, visited) {
 }
 
 function hasTwoConnections(a, b, gVerts) {
-    var visited = [a];
-    var found = false;
-    for (var j = 0; j < gVerts[a].length; j++) {
+    const visited = [a];
+    let found = false;
+    for (let j = 0; j < gVerts[a].length; j++) {
         if (gVerts[a][j] !== b) {
             found = found || diveSearch(gVerts[a][j], b, gVerts, visited);
         }
@@ -66,15 +64,15 @@ function hasTwoConnections(a, b, gVerts) {
 
 function generateTunnel(roomA, roomB) {
     // room: x, y, w, h
-    var tunnel = [];
-    var dx = roomA.x - roomB.x;
-    var dy = roomA.y - roomB.y;
-    var overlapX = (roomA.w + roomB.w) / 2 - Math.abs(dx);
-    var overlapY = (roomA.h + roomB.h) / 2 - Math.abs(dy);
+    let tunnel = [];
+    const dx = roomA.x - roomB.x;
+    const dy = roomA.y - roomB.y;
+    const overlapX = (roomA.w + roomB.w) / 2 - Math.abs(dx);
+    const overlapY = (roomA.h + roomB.h) / 2 - Math.abs(dy);
 
     if (overlapX > 0) {
 
-        var x = roomA.x < roomB.x ? roomA.x + roomA.w / 2 : roomB.x + roomB.w / 2;
+        let x = roomA.x < roomB.x ? roomA.x + roomA.w / 2 : roomB.x + roomB.w / 2;
         x -= (Math.random() * 0.6 + 0.2) * overlapX;
 
         tunnel = dy < 0 ? [x, roomA.y + roomA.h / 2, x, roomB.y - roomB.h / 2] :
@@ -82,18 +80,18 @@ function generateTunnel(roomA, roomB) {
 
     } else if (overlapY > 0) {
 
-        var y = roomA.y < roomB.y ? roomA.y + roomA.h / 2 : roomB.y + roomB.h / 2;
+        let y = roomA.y < roomB.y ? roomA.y + roomA.h / 2 : roomB.y + roomB.h / 2;
         y -= (Math.random() * 0.6 + 0.2) * overlapY;
         tunnel = dx < 0 ? [roomA.x + roomA.w / 2, y, roomB.x - roomB.w / 2, y] :
             [roomA.x - roomA.w / 2, y, roomB.x + roomB.w / 2, y];
 
     } else {
 
-        var y1 = dy < 0 ? roomA.y + roomA.h / 2 : roomA.y - roomA.h / 2;
-        var x1 = roomA.x + (Math.random() - 0.5) * roomA.w * 0.8;
+        const y1 = dy < 0 ? roomA.y + roomA.h / 2 : roomA.y - roomA.h / 2;
+        const x1 = roomA.x + (Math.random() - 0.5) * roomA.w * 0.8;
 
-        var x2 = dx < 0 ? roomB.x - roomB.w / 2 : roomB.x + roomB.w / 2;
-        var y2 = roomB.y + (Math.random() - 0.5) * roomB.h * 0.8;
+        const x2 = dx < 0 ? roomB.x - roomB.w / 2 : roomB.x + roomB.w / 2;
+        const y2 = roomB.y + (Math.random() - 0.5) * roomB.h * 0.8;
 
         tunnel = [x1, y1, x1, y2, x1, y2, x2, y2];
     }
@@ -107,37 +105,35 @@ function generateTunnel(roomA, roomB) {
 // todo: if one red room is very far from others -> add red room in between
 window.dungeonizer = window.dungeonizer || {};
 window.dungeonizer.generateDungeon = function() {
-    var seed = 1;
-    var dungeonSize = 13;
-    var midRoomAspect = 1;
-    var roomsAmount = dungeonSize * 5 + Math.floor(Math.random() * 10);
+    // const seed = 1;
+    const dungeonSize = 13;
+    // const midRoomAspect = 1;
+    const roomsAmount = dungeonSize * 5 + Math.floor(Math.random() * 10);
 
-    var minSize = 4;
-    var maxSize = 14;
+    const minSize = 4;
+    const maxSize = 14;
 
-    var rooms = [];
-    var i, j, k, ii;
+    const rooms = [];
+    let i, j, k, ii;
 
     // generate sizes
-    var w, h, size;
-    var sortedBySizeRoomIndices = [];
+    let w, h, size;
     for (i = 0; i < roomsAmount; i++) {
         w = minSize + Math.floor(Math.random() * (maxSize - minSize)); // todo: use nice distribution
         h = minSize + Math.floor(Math.random() * (maxSize - minSize)); // Math.floor(w * midRoomAspect * (Math.random() + 0.5));
         size = w * h;
-        rooms.push({x: 0, y: 0, w: w, h: h, size: size, x1: -w / 2, x2: w / 2, y1: -h / 2, y2: h / 2, isMain: 0});
+        rooms.push({x: 0, y: 0, w, h, size, x1: -w / 2, x2: w / 2, y1: -h / 2, y2: h / 2, isMain: 0});
     }
-    var rooms1 = rooms.slice();
 
     // place rooms
-    var maxR = roomsAmount * maxSize * 2;
+    const maxR = roomsAmount * maxSize * 2;
     for (i = 1; i < roomsAmount; i++) {
-        var roomAngle = Math.random() * 2 * Math.PI;
+        const roomAngle = Math.random() * 2 * Math.PI;
 
-        var posX = 0;
-        var posY = 0;
-        var dirX = Math.cos(roomAngle);
-        var dirY = Math.sin(roomAngle);
+        let posX = 0;
+        let posY = 0;
+        const dirX = Math.cos(roomAngle);
+        const dirY = Math.sin(roomAngle);
 
         for (k = 0; k < maxR; k++) {
 
@@ -147,7 +143,7 @@ window.dungeonizer.generateDungeon = function() {
             rooms[i].x = posX;
             rooms[i].y = posY;
 
-            var collidedByAny = false;
+            let collidedByAny = false;
             for (j = 0; j < i; j++) {
                 if (isCollided(rooms[j], rooms[i])) {
                     collidedByAny = true;
@@ -158,15 +154,15 @@ window.dungeonizer.generateDungeon = function() {
 
             if (!collidedByAny) {
                 // make a round trying to place closer to center
-                var d = Math.sqrt(posX * posX + posY * posY);
-                var curAngle = roomAngle;
-                var curPosX, curPosY;
+                let d = Math.sqrt(posX * posX + posY * posY);
+                let curAngle = roomAngle;
+                let curPosX, curPosY;
 
                 while (curAngle - roomAngle < Math.PI * 2) {
                     // curAngle += 1 / d;
-                   curAngle += Math.PI / 2;
+                    curAngle += Math.PI / 2;
 
-                   for (ii = d; ii > 0; ii--) {
+                    for (ii = d; ii > 0; ii--) {
                         curPosX = ii * Math.cos(curAngle);
                         curPosY = ii * Math.sin(curAngle);
                         collidedByAny = false;
@@ -185,7 +181,7 @@ window.dungeonizer.generateDungeon = function() {
                         }
                     }
 
-               }
+                }
 
                 rooms[i].x = posX;
                 rooms[i].y = posY;
@@ -200,23 +196,23 @@ window.dungeonizer.generateDungeon = function() {
     }
 
     // choose main rooms
-    var mainVerts = [];
-    var threshold = maxSize * 0.75;
+    const mainVerts = [];
+    const threshold = maxSize * 0.75;
     for (i = 0; i < rooms.length; i++) {
-        if (/*rooms[i].w > threshold && rooms[i].h > threshold*/ rooms[i].size > threshold * threshold) {
+        if (/* rooms[i].w > threshold && rooms[i].h > threshold*/ rooms[i].size > threshold * threshold) {
             rooms[i].isMain = 1;
             mainVerts.push([rooms[i].x, rooms[i].y, i]);
         }
     }
 
     // /
-    var delTriangles = Delaunay.triangulate(mainVerts);
+    const delTriangles = Delaunay.triangulate(mainVerts);
 
-    var triangulationLines = [];
-    var edges = [];
-    var gVerts = [];
-    var ind0, ind1, ind2;
-    var f01, f02, f12;
+    const triangulationLines = [];
+    const edges = [];
+    const gVerts = [];
+    let ind0, ind1, ind2;
+    let f01, f02, f12;
     for (i = 0; i < delTriangles.length - 1; i += 3) {
         ind0 = delTriangles[i];
         ind1 = delTriangles[i + 1];
@@ -264,16 +260,14 @@ window.dungeonizer.generateDungeon = function() {
     }
 
     // form minimum spanning tree (+extra leftAlive edges)
-    edges.sort(function(a, b) {
-        return a.dSq - b.dSq;
-    });
+    edges.sort((a, b) => { return a.dSq - b.dSq; });
 
-    var hasSecondConnection;
-    var a, b, tPos;
-    var leaveEdgeAliveOneFrom = 9;
-    var leavingAlive = 0;
-    var leftAlive = [];
-    for (i = edges.length - 1; i >= 0 ; i--) {
+    let hasSecondConnection;
+    let a, b, tPos;
+    const leaveEdgeAliveOneFrom = 9;
+    let leavingAlive = 0;
+    const leftAlive = [];
+    for (i = edges.length - 1; i >= 0; i--) {
         hasSecondConnection = false;
         a = edges[i].a;
         b = edges[i].b;
@@ -281,7 +275,7 @@ window.dungeonizer.generateDungeon = function() {
         hasSecondConnection = hasTwoConnections(a, b, gVerts);
         if (hasSecondConnection) {
             if (leavingAlive > 0) {
-                leftAlive.push({a: a, b: b});
+                leftAlive.push({a, b});
             }
             tPos = gVerts[a].indexOf(b);
             gVerts[a].splice(tPos, 1);
@@ -295,22 +289,22 @@ window.dungeonizer.generateDungeon = function() {
     }
 
     // tunnels & debug edge lines
-    var tunnel;
-    var tunnels = [];
-    var mstLines = [];
+    let tunnel;
+    const tunnels = [];
+    const mstLines = [];
     for (i = 0; i < edges.length; i++) {
         mstLines.push(mainVerts[edges[i].a][0], mainVerts[edges[i].a][1], mainVerts[edges[i].b][0], mainVerts[edges[i].b][1]);
-        tunnel = generateTunnel( rooms[mainVerts[edges[i].a][2]], rooms[mainVerts[edges[i].b][2]] );
+        tunnel = generateTunnel(rooms[mainVerts[edges[i].a][2]], rooms[mainVerts[edges[i].b][2]]);
         Array.prototype.push.apply(tunnels, tunnel);
     }
-    var leftAliveLines = [];
+    const leftAliveLines = [];
     for (i = 0; i < leftAlive.length; i++) {
         leftAliveLines.push(mainVerts[leftAlive[i].a][0], mainVerts[leftAlive[i].a][1], mainVerts[leftAlive[i].b][0], mainVerts[leftAlive[i].b][1]);
-        tunnel = generateTunnel( rooms[mainVerts[leftAlive[i].a][2]], rooms[mainVerts[leftAlive[i].b][2]]);
+        tunnel = generateTunnel(rooms[mainVerts[leftAlive[i].a][2]], rooms[mainVerts[leftAlive[i].b][2]]);
         Array.prototype.push.apply(tunnels, tunnel);
     }
 
-    var room;
+    let room;
     for (i = 0; i < rooms.length; i++) {
         room = rooms[i];
         if (room.isMain < 1) {
@@ -328,7 +322,7 @@ window.dungeonizer.generateDungeon = function() {
         floors: rooms,
         fullDelaunayTriangles: triangulationLines,
         triangles: mstLines,
-        leftAliveLines: leftAliveLines,
-        tunnels: tunnels
+        leftAliveLines,
+        tunnels
     };
 };
