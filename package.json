@@ -1,0 +1,33 @@
+{
+  "name": "dungeonizer-js",
+  "version": "0.0.0",
+  "engines": {
+    "node": ">=5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mlknz/Dungeonizer.js"
+  },
+  "devDependencies": {
+    "babel-core": "^6.4.5",
+    "babel-eslint": "^4.1.6",
+    "babel-loader": "^6.2.1",
+    "babel-preset-es2015": "^6.3.13",
+    "browser-sync": "^2.11.1",
+    "del": "^2.2.0",
+    "gulp": "^3.9.0",
+    "gulp-if": "^2.0.0",
+    "gulp-util": "^3.0.7",
+    "eslint": "^1.10.3",
+    "eslint-config-airbnb": "^4.0.0",
+    "eslint-loader": "^1.2.1",
+    "ip": "^1.1.0",
+    "json-loader": "^0.5.4",
+    "portfinder": "^0.4.0",
+    "three": "0.80.0",
+    "webpack": "^1.12.12",
+    "webpack-dev-server": "^1.14.1",
+    "webpack-glsl-loader": "^1.0.1",
+    "webpack-module-hot-accept": "1.0.3"
+  }
+}
