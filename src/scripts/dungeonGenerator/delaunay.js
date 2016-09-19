@@ -1,4 +1,5 @@
 // https://github.com/ironwallaby/delaunay
+/* eslint-disable */
 var Delaunay;
 
 (function() {
