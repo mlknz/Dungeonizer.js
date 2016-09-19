@@ -23,7 +23,7 @@ window.dungeonizer.visualize = function(renderer) {
     camera.lookAt(new THREE.Vector3(0, 0, 0));
     camera.updateProjectionMatrix();
 
-    const dungeon = window.dungeonizer.generateDungeon();
+    const dungeon = window.dungeonizer.generateDungeon({seed: 1});
 
     const scene = new THREE.Scene();
 
