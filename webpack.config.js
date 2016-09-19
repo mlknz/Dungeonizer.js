@@ -3,20 +3,7 @@ const path = require('path');
 
 module.exports = (opts) => {
 
-    const plugins = [
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'app',
-            chunks: ['app']
-        }),
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'vis',
-            chunks: ['vis']
-        }),
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'gen',
-            chunks: ['gen']
-        })
-    ].concat(opts.prod ? [
+    const plugins = opts.prod ? [
         new webpack.optimize.UglifyJsPlugin({
             compress: {warnings: false},
             output: {comments: false}
@@ -26,7 +13,7 @@ module.exports = (opts) => {
             THREE: 'three'
         }),
         new webpack.HotModuleReplacementPlugin()
-    ]);
+    ];
 
     return {
         entry: {

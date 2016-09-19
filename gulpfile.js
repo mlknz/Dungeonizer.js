@@ -11,19 +11,12 @@ const del = require('del');
 function runServerOnPort(config, port) {
     const localServer = `http://${ip.address()}:${port}`;
 
-    // TODO: fix that
-    config.entry.vis.push(
-        'webpack/hot/only-dev-server',
-        `webpack-dev-server/client?${localServer}`
-    );
-    config.entry.gen.push(
-        'webpack/hot/only-dev-server',
-        `webpack-dev-server/client?${localServer}`
-    );
-    config.entry.app.push(
-        'webpack/hot/only-dev-server',
-        `webpack-dev-server/client?${localServer}`
-    );
+    Object.keys(config.entry).forEach(entryName => {
+        config.entry[entryName].push(
+            'webpack/hot/only-dev-server',
+            `webpack-dev-server/client?${localServer}`
+        );
+    });
 
     config.output.publicPath = localServer + '/';
 
