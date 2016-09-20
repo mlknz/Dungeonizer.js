@@ -56,6 +56,6 @@ module.exports = (opts) => {
         eslint: {emitWarning: true},
         debug: !opts.prod,
 
-        devtool: opts.prod ? undefined : 'cheap-module-source-map'
+        devtool: opts.prod ? undefined : 'cheap-source-map'
     };
 };
