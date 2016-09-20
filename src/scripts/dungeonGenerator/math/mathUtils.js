@@ -17,3 +17,7 @@ export function alignedSegmentRectangleCol(sx1, sy1, sx2, sy2, rx1, ry1, rx2, ry
     }
     return false;
 }
+
+export function dSq(a, b) {
+    return (a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]);
+}
