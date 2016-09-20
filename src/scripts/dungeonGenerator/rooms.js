@@ -1,38 +1,30 @@
+import {rectanglesCollided} from './math/mathUtils.js';
+
 class Rooms {
-      constructor() {
-          const dungeonSize = 13;
-          this.minSize = 4;
-          this.maxSize = 14;
+      constructor(dungeonSize) {
+          this.minRoomSize = 4;
+          this.maxRoomSize = 14;
           this.rooms = [];
           this.roomsAmount = dungeonSize * 5 + Math.floor(Math.random() * 10);
-
-          this.generateRoomSizes();
-          this.placeRooms();
       }
 
       generateRoomSizes() {
           let w, h, size;
-          const minSize = this.minSize;
-          const maxSize = this.maxSize;
+          const minRoomSize = this.minRoomSize;
+          const maxRoomSize = this.maxRoomSize;
           for (let i = 0; i < this.roomsAmount; i++) {
-              w = minSize + Math.floor(Math.random() * (maxSize - minSize)); // todo: use nice distribution
-              h = minSize + Math.floor(Math.random() * (maxSize - minSize)); // Math.floor(w * midRoomAspect * (Math.random() + 0.5));
+              w = minRoomSize + Math.floor(Math.random() * (maxRoomSize - minRoomSize)); // todo: use nice distribution
+              h = minRoomSize + Math.floor(Math.random() * (maxRoomSize - minRoomSize)); // Math.floor(w * midRoomAspect * (Math.random() + 0.5));
               size = w * h;
               this.rooms.push({x: 0, y: 0, w, h, size, x1: -w / 2, x2: w / 2, y1: -h / 2, y2: h / 2, isMain: 0});
           }
       }
 
-      isCollided(a, b) {
-          if (a.x - a.w / 2 < b.x + b.w / 2 && a.x + a.w / 2 > b.x - b.w / 2 &&
-              a.y + a.h / 2 > b.y - b.h / 2 && a.y - a.h / 2 < b.y + b.h / 2) return true;
-          return false;
-      }
-
       placeRooms() {
           const rooms = this.rooms;
           const roomsAmount = this.roomsAmount;
-          const maxSize = this.maxSize;
-          const maxR = roomsAmount * maxSize * 2;
+          const maxRoomSize = this.maxRoomSize;
+          const maxR = roomsAmount * maxRoomSize * 2;
           for (let i = 1; i < roomsAmount; i++) {
               const roomAngle = Math.random() * 2 * Math.PI;
 
@@ -51,7 +43,7 @@ class Rooms {
 
                   let collidedByAny = false;
                   for (let j = 0; j < i; j++) {
-                      if (this.isCollided(rooms[j], rooms[i])) {
+                      if (rectanglesCollided(rooms[j], rooms[i])) {
                           collidedByAny = true;
                           break;
                       }
@@ -65,7 +57,7 @@ class Rooms {
 
                       while (curAngle - roomAngle < Math.PI * 2) {
                           // curAngle += 1 / d;
-                          curAngle += Math.PI / 2;
+                          curAngle += Math.PI / 2; // todo: that is "density" param
 
                           for (let ii = d; ii > 0; ii--) {
                               curPosX = ii * Math.cos(curAngle);
@@ -74,7 +66,7 @@ class Rooms {
                               for (let j = 0; j < i; j++) {
                                   rooms[i].x = curPosX;
                                   rooms[i].y = curPosY;
-                                  if (this.isCollided(rooms[j], rooms[i])) {
+                                  if (rectanglesCollided(rooms[j], rooms[i])) {
                                       collidedByAny = true;
                                       break;
                                   }
@@ -101,13 +93,12 @@ class Rooms {
           }
       }
 
-      chooseMainRooms() {
+      chooseMainRooms(rooms) {
           const mainVerts = [];
-          const rooms = this.rooms;
-          const threshold = this.maxSize * 0.75;
+          const threshold = this.maxRoomSize * 0.75;
           for (let i = 0; i < rooms.length; i++) {
               if (/* rooms[i].w > threshold && rooms[i].h > threshold*/ rooms[i].size > threshold * threshold) {
-                  rooms[i].isMain = 1;
+                  rooms[i].isMain = 1; // todo: param reassign :(
                   mainVerts.push([rooms[i].x, rooms[i].y, i]);
               }
           }

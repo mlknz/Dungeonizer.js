@@ -2,7 +2,7 @@ if (module.hot) {
     module.hot.accept();
 }
 
-const Delaunay = require('./delaunay.js');
+const Delaunay = require('./math/delaunay.js');
 import Rooms from './rooms.js';
 import Tunnels from './tunnels.js';
 import Connections from './connections.js';
@@ -15,17 +15,20 @@ import Connections from './connections.js';
 window.dungeonizer = window.dungeonizer || {};
 window.dungeonizer.generateDungeon = function({seed}) {
     // const seed = 1;
-    // const dungeonSize = 13;
+    const dungeonSize = 13;
     // const midRoomAspect = 1;
 
-    const rooms = new Rooms();
-    const mainVerts = rooms.chooseMainRooms();
+    const rooms = new Rooms(dungeonSize);
+    rooms.generateRoomSizes();
+    rooms.placeRooms();
+    const mainRoomsCenters = rooms.chooseMainRooms(rooms.rooms);
 
-    const delTriangles = Delaunay.triangulate(mainVerts);
+    const delTriangles = Delaunay.triangulate(mainRoomsCenters);
 
-    const connections = new Connections(mainVerts, delTriangles);
+    // todo: refactor connections
+    const connections = new Connections(mainRoomsCenters, delTriangles);
 
-    const tunnels = new Tunnels(rooms.rooms, connections.edges, connections.leftAlive, mainVerts);
+    const tunnels = new Tunnels(rooms.rooms, connections.edges, connections.leftAlive, mainRoomsCenters);
 
     return {
         floors: rooms.rooms,

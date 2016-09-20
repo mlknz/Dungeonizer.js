@@ -1,3 +1,5 @@
+import {alignedSegmentRectangleCol} from './math/mathUtils.js';
+
 class Tunnels {
     constructor(rooms, edges, leftAlive, mainVerts) {
         let tunnel;
@@ -21,7 +23,7 @@ class Tunnels {
             room = rooms[i];
             if (room.isMain < 1) {
                 for (let j = 0; j < tunnels.length; j = j + 4) {
-                    if (this.segmentRectangleCol(tunnels[j], tunnels[j + 1], tunnels[j + 2], tunnels[j + 3],
+                    if (alignedSegmentRectangleCol(tunnels[j], tunnels[j + 1], tunnels[j + 2], tunnels[j + 3],
                     room.x1, room.y1, room.x2, room.y2) !== false) {
                         room.isMain = 2;
                         break;
@@ -71,20 +73,6 @@ class Tunnels {
             tunnel = [x1, y1, x1, y2, x1, y2, x2, y2];
         }
         return tunnel;
-    }
-
-    segmentRectangleCol(sx1, sy1, sx2, sy2, rx1, ry1, rx2, ry2) {
-        if (sx1 > Math.min(rx1, rx2) && sx1 < Math.max(rx1, rx2)) {
-            if (
-                (ry1 > Math.min(sy1, sy2) && ry1 < Math.max(sy1, sy2)) || ((ry2 > Math.min(sy1, sy2) && ry2 < Math.max(sy1, sy2)))) {
-                return true;
-            }
-        } else if (sy1 > Math.min(ry1, ry2) && sy1 < Math.max(ry1, ry2)) {
-            if ((rx1 > Math.min(sx1, sx2) && rx1 < Math.max(sx1, sx2)) || ((rx2 > Math.min(sx1, sx2) && rx2 < Math.max(sx1, sx2)))) {
-                return true;
-            }
-        }
-        return false;
     }
 }
 
