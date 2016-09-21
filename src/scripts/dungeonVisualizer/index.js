@@ -8,10 +8,34 @@ import Floors from './prefabs/floors.js';
 import Tunnels from './prefabs/tunnels.js';
 import Lines from './prefabs/lines.js';
 
-// todo: ui-generateNew with custom seed option
+
+const clearScene = function(scene) {
+    scene.children.forEach(obj => {
+        if (obj.name.includes('Dungeon')) scene.remove(obj);
+    });
+};
+
+const createDungeonShape = function(dungeon, seed) {
+    const root = new THREE.Object3D();
+    root.name = 'Dungeon_' + seed;
+
+    const floorsMesh = new Floors(dungeon.floors);
+    root.add(floorsMesh);
+
+    const tunnelsMesh = new Tunnels(dungeon.tunnels);
+    root.add(tunnelsMesh);
+
+    const trianglesMesh = new Lines(dungeon.triangles, 0x0000ff);
+    root.add(trianglesMesh);
+
+    const leftAliveMesh = new Lines(dungeon.leftAliveLines, 0x00ff00);
+    root.add(leftAliveMesh);
+
+    return root;
+};
 
 window.dungeonizer = window.dungeonizer || {};
-window.dungeonizer.visualize = function(renderer) {
+window.dungeonizer.initVisualizer = function(renderer) {
 
     renderer.setClearColor(0x334422, 1.0);
 
@@ -25,26 +49,9 @@ window.dungeonizer.visualize = function(renderer) {
     camera.lookAt(new THREE.Vector3(0, 0, 0));
     camera.updateProjectionMatrix();
 
-    const dungeon = window.dungeonizer.generateDungeon({
-        seed: (Math.random() + 1).toString(36).substring(7, 16),
-        dungeonSize: 13,
-        connectivity: 0.55,
-        debugData: true
-    });
+    const controls = new Controls(camera, renderer.domElement);
 
     const scene = new THREE.Scene();
-
-    const floorsMesh = new Floors(dungeon.floors);
-    scene.add(floorsMesh);
-
-    const tunnelsMesh = new Tunnels(dungeon.tunnels);
-    scene.add(tunnelsMesh);
-
-    const trianglesMesh = new Lines(dungeon.triangles, 0x0000ff);
-    scene.add(trianglesMesh);
-
-    const leftAliveMesh = new Lines(dungeon.leftAliveLines, 0x00ff00);
-    scene.add(leftAliveMesh);
 
     const light = new THREE.AmbientLight(0x202020);
     scene.add(light);
@@ -52,8 +59,6 @@ window.dungeonizer.visualize = function(renderer) {
     const dirLight = new THREE.DirectionalLight(0xaaaaaa);
     dirLight.position.set(10, 20, 10);
     scene.add(dirLight);
-
-    const controls = new Controls(camera, renderer.domElement);
 
     return {
         scene,
@@ -71,6 +76,12 @@ window.dungeonizer.visualize = function(renderer) {
         },
         dispose() {
             controls.dispose();
+            clearScene(scene);
+        },
+        makeDungeonVisual(dungeon, seed) {
+            clearScene(scene);
+            const dungeonShape = createDungeonShape(dungeon, seed);
+            scene.add(dungeonShape);
         }
     };
 };
