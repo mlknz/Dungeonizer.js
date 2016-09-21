@@ -7,18 +7,18 @@ import Tunnels from './tunnels.js';
 
 import {processTriangulation, generateMST} from './math/graphUtils.js';
 const Delaunay = require('./math/delaunay.js');
+const seedrandom = require('seedrandom');
 
-
-// todo: random seed
 // todo: minimum red rooms amount (room sizes distribution)
 // todo: maximum red rooms amount (room sizes distribution)
 // todo: >3 green on one tunnel -> offset and generetae pipe to it
 // todo: if one red room is very far from others -> add red room in between
 window.dungeonizer = window.dungeonizer || {};
-window.dungeonizer.generateDungeon = function({seed, debugData}) {
-    // const seed = 1;
-    const dungeonSize = 13;
+window.dungeonizer.generateDungeon = function({seed, dungeonSize, debugData}) {
+
     // const midRoomAspect = 1;
+    console.log('Seed string is:', seed);
+    seedrandom(seed, { global: true });
 
     const rooms = new Rooms(dungeonSize);
     rooms.generateRoomSizes();
@@ -28,7 +28,7 @@ window.dungeonizer.generateDungeon = function({seed, debugData}) {
     const delTriangles = Delaunay.triangulate(mainRoomsCenters);
     const triangulation = processTriangulation(mainRoomsCenters, delTriangles);
 
-    const leaveExtraEdgeOneFrom = 9;
+    const leaveExtraEdgeOneFrom = 9; // connectivity
     const minSpanningTree = generateMST(triangulation.edges, triangulation.gVerts, leaveExtraEdgeOneFrom);
 
     const tunnels = new Tunnels(rooms.rooms, minSpanningTree.edges, minSpanningTree.leftAlive, mainRoomsCenters);

@@ -8,6 +8,8 @@ import Floors from './prefabs/floors.js';
 import Tunnels from './prefabs/tunnels.js';
 import Lines from './prefabs/lines.js';
 
+// todo: ui-generateNew with custom seed option
+
 window.dungeonizer = window.dungeonizer || {};
 window.dungeonizer.visualize = function(renderer) {
 
@@ -16,14 +18,18 @@ window.dungeonizer.visualize = function(renderer) {
     const gl = renderer.getContext();
     let aspectRatio = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
-    const camera = new THREE.PerspectiveCamera(60, aspectRatio, 1, 10000);
+    const camera = new THREE.PerspectiveCamera(60, aspectRatio, 0.1, 1000);
     camera.position.z = 76;
     camera.position.y = 70;
     camera.position.x = 62;
     camera.lookAt(new THREE.Vector3(0, 0, 0));
     camera.updateProjectionMatrix();
 
-    const dungeon = window.dungeonizer.generateDungeon({seed: 1, debugData: true});
+    const dungeon = window.dungeonizer.generateDungeon({
+        seed: (Math.random() + 1).toString(36).substring(7, 16),
+        dungeonSize: 13,
+        debugData: true
+    });
 
     const scene = new THREE.Scene();
 
