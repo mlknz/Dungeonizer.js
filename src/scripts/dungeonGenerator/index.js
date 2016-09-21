@@ -14,7 +14,7 @@ const seedrandom = require('seedrandom');
 // todo: >3 green on one tunnel -> offset and generetae pipe to it
 // todo: if one red room is very far from others -> add red room in between
 window.dungeonizer = window.dungeonizer || {};
-window.dungeonizer.generateDungeon = function({seed, dungeonSize, debugData}) {
+window.dungeonizer.generateDungeon = function({seed, dungeonSize, connectivity, debugData}) {
 
     // const midRoomAspect = 1;
     console.log('Seed string is:', seed);
@@ -28,7 +28,7 @@ window.dungeonizer.generateDungeon = function({seed, dungeonSize, debugData}) {
     const delTriangles = Delaunay.triangulate(mainRoomsCenters);
     const triangulation = processTriangulation(mainRoomsCenters, delTriangles);
 
-    const leaveExtraEdgeOneFrom = 9; // connectivity
+    const leaveExtraEdgeOneFrom = Math.pow(100, 1 - Math.max(Math.min(connectivity, 1), 0));
     const minSpanningTree = generateMST(triangulation.edges, triangulation.gVerts, leaveExtraEdgeOneFrom);
 
     const tunnels = new Tunnels(rooms.rooms, minSpanningTree.edges, minSpanningTree.leftAlive, mainRoomsCenters);

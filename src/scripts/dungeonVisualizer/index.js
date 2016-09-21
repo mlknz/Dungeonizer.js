@@ -28,6 +28,7 @@ window.dungeonizer.visualize = function(renderer) {
     const dungeon = window.dungeonizer.generateDungeon({
         seed: (Math.random() + 1).toString(36).substring(7, 16),
         dungeonSize: 13,
+        connectivity: 0.55,
         debugData: true
     });
 
