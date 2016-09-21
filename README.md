@@ -1,6 +1,6 @@
 # Dungeonizer.js
 
-Dungeon generation + visualization.
+Dungeon generation + visualization.  
 [Live version here.](https://mlknz.github.io/Dungeonizer.js/)
 
 Project builds into 3 scripts which could be used separately: dungeonGenerator, dungeonVisualiser, app.

@@ -1,13 +1,15 @@
 {
   "name": "dungeonizer-js",
   "version": "0.0.0",
-  "engines": {
-    "node": ">=5.0.0"
-  },
+  "author": "mlknz",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/mlknz/Dungeonizer.js"
   },
+  "engines": {
+    "node": ">=5.0.0"
+},
   "devDependencies": {
     "babel-core": "^6.4.5",
     "babel-eslint": "^4.1.6",
