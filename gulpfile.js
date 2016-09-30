@@ -77,6 +77,8 @@ gulp.task('static', () => {
 gulp.task('libs', () => {
     gulp.src('node_modules/three/build/three.min.js')
         .pipe(gulp.dest('dist/libs'));
+    gulp.src('src/libs/*')
+        .pipe(gulp.dest('dist/libs'));
 });
 
 gulp.task('webpack:prod', cb => webpackTask(cb, {prod: true}));

@@ -14,10 +14,9 @@ const seedrandom = require('seedrandom');
 // todo: >3 green on one tunnel -> offset and generetae pipe to it
 // todo: if one red room is very far from others -> add red room in between
 window.dungeonizer = window.dungeonizer || {};
-window.dungeonizer.generateDungeon = function({seed, dungeonSize, connectivity, debugData}) {
+const generateDungeonImpl = function({seed, dungeonSize, connectivity, debugData}) {
 
     // const midRoomAspect = 1;
-    console.log('Seed string is:', seed);
     seedrandom(seed, { global: true });
 
     const rooms = new Rooms(dungeonSize);
@@ -40,4 +39,22 @@ window.dungeonizer.generateDungeon = function({seed, dungeonSize, connectivity, 
         leftAliveLines: tunnels.leftAliveLines,
         tunnels: tunnels.tunnels
     };
+};
+
+window.dungeonizer.generateDungeon = function(params) {
+    console.log('Dungeon params are:', params);
+    // todo: check params validity
+    return generateDungeonImpl(params);
+};
+
+window.dungeonizer.generateDungeonById = function(dungeonId, debugData) {
+    console.log('DungeonID is:', dungeonId);
+    const params = dungeonId.split(',');
+    // todo: check params validity
+    return generateDungeonImpl({
+        seed: params[0],
+        dungeonSize: params[1],
+        connectivity: params[2],
+        debugData
+    });
 };
