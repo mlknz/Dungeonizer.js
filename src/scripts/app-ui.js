@@ -9,7 +9,7 @@ class AppUi {
             roomSizeDeviation: 0.75,
             mainRoomThreshold: 1.1,
             minMainRoomsAmount: 6,
-            maxMainRoomsRate: 0.13,
+            maxMainRoomsRate: 0.23,
             connectivity: 0.55,
             fromDungeonId: false,
             dungeonId: ''
