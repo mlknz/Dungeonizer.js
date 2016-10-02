@@ -47,6 +47,7 @@ window.dungeonizer.generateDungeon = function(params) {
     return generateDungeonImpl(params);
 };
 
+// todo: query string params?
 window.dungeonizer.generateDungeonById = function(dungeonId, debugData) {
     console.log('DungeonID is:', dungeonId);
     const params = dungeonId.split(',');

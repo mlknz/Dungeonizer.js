@@ -27,13 +27,8 @@ class App {
 
         const dungeonVisualizer = window.dungeonizer.initVisualizer(renderer);
 
-        const resetDungeon = (dungeonId) => {
-            const dungeon = window.dungeonizer.generateDungeonById(dungeonId, true);
-            dungeonVisualizer.makeDungeonVisual(dungeon, dungeonId);
-        };
-
-        const appUi = new AppUi(resetDungeon);
-        appUi.resetDungeon((Math.random() + 1).toString(36).substring(7, 16) + ',13,0.55');
+        const appUi = new AppUi(dungeonVisualizer);
+        appUi.resetDungeon();
 
         const gl = renderer.getContext();
         function resize() {
