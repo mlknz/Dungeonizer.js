@@ -1,20 +1,37 @@
 import {rectanglesCollided} from './math/mathUtils.js';
 
 class Rooms {
-      constructor(dungeonSize) {
-          this.minRoomSize = 4;
-          this.maxRoomSize = 14;
+      constructor(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation) {
+          this.roomSizeDistribution = roomSizeDistribution;
+          this.roomSizeMean = roomSizeMean;
+          this.roomSizeDeviation = roomSizeDeviation;
+          this.minRoomSize = roomSizeMean * (1 - roomSizeDeviation);
+          this.maxRoomSize = roomSizeMean * (1 + roomSizeDeviation);
           this.rooms = [];
-          this.roomsAmount = dungeonSize * 5 + Math.floor(Math.random() * 10);
+          this.roomsAmount = dungeonSize * 5 + Math.floor(Math.random() * dungeonSize);
+      }
+
+      getBoxMullerGaussianNoise() {
+          const u = Math.random();
+          const v = Math.random();
+          return Math.max(Math.min(Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v), 3), -3);
+      }
+
+      getDistributionPoint() {
+          switch (this.roomSizeDistribution) {
+          default:
+          case 'normal':
+              return this.getBoxMullerGaussianNoise() * (this.maxRoomSize - this.minRoomSize) / 6 + this.roomSizeMean + 0.5;
+          case 'uniform':
+              return this.minRoomSize + Math.floor(Math.random() * (this.maxRoomSize - this.minRoomSize));
+          }
       }
 
       generateRoomSizes() {
           let w, h, size;
-          const minRoomSize = this.minRoomSize;
-          const maxRoomSize = this.maxRoomSize;
           for (let i = 0; i < this.roomsAmount; i++) {
-              w = minRoomSize + Math.floor(Math.random() * (maxRoomSize - minRoomSize)); // todo: use nice distribution
-              h = minRoomSize + Math.floor(Math.random() * (maxRoomSize - minRoomSize)); // Math.floor(w * midRoomAspect * (Math.random() + 0.5));
+              w = this.getDistributionPoint();
+              h = this.getDistributionPoint();
               size = w * h;
               this.rooms.push({x: 0, y: 0, w, h, size, x1: -w / 2, x2: w / 2, y1: -h / 2, y2: h / 2, isMain: 0});
           }

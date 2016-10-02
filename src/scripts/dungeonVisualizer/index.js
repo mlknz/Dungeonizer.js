@@ -42,7 +42,7 @@ window.dungeonizer.initVisualizer = function(renderer) {
     const gl = renderer.getContext();
     let aspectRatio = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
-    const camera = new THREE.PerspectiveCamera(60, aspectRatio, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(60, aspectRatio, 0.1, 2000);
     camera.position.z = 76;
     camera.position.y = 70;
     camera.position.x = 62;
