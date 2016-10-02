@@ -1,27 +1,25 @@
-import {rectanglesCollided} from './math/mathUtils.js';
+import {rectanglesCollided, getBoxMullerGaussianNoise} from './math/mathUtils.js';
 
 class Rooms {
-      constructor(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation) {
+      constructor(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation, mainRoomThreshold, minMainRoomsAmount, maxMainRoomsRate) {
           this.roomSizeDistribution = roomSizeDistribution;
           this.roomSizeMean = roomSizeMean;
           this.roomSizeDeviation = roomSizeDeviation;
+          this.mainRoomThreshold = mainRoomThreshold;
+          this.minMainRoomsAmount = minMainRoomsAmount;
+          this.maxMainRoomsRate = maxMainRoomsRate;
+
           this.minRoomSize = roomSizeMean * (1 - roomSizeDeviation);
           this.maxRoomSize = roomSizeMean * (1 + roomSizeDeviation);
           this.rooms = [];
           this.roomsAmount = dungeonSize * 5 + Math.floor(Math.random() * dungeonSize);
       }
 
-      getBoxMullerGaussianNoise() {
-          const u = Math.random();
-          const v = Math.random();
-          return Math.max(Math.min(Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v), 3), -3);
-      }
-
       getDistributionPoint() {
           switch (this.roomSizeDistribution) {
           default:
           case 'normal':
-              return this.getBoxMullerGaussianNoise() * (this.maxRoomSize - this.minRoomSize) / 6 + this.roomSizeMean + 0.5;
+              return getBoxMullerGaussianNoise() * (this.maxRoomSize - this.minRoomSize) / 6 + this.roomSizeMean + 0.5;
           case 'uniform':
               return this.minRoomSize + Math.floor(Math.random() * (this.maxRoomSize - this.minRoomSize));
           }
@@ -112,11 +110,26 @@ class Rooms {
 
       chooseMainRooms(rooms) {
           const mainVerts = [];
-          const threshold = this.maxRoomSize * 0.75;
-          for (let i = 0; i < rooms.length; i++) {
-              if (/* rooms[i].w > threshold && rooms[i].h > threshold*/ rooms[i].size > threshold * threshold) {
-                  rooms[i].isMain = 1; // todo: param reassign :(
+          const threshold = this.roomSizeMean * this.mainRoomThreshold;
+
+          let mainRoomsAmount = 0;
+          for (let i = rooms.length - 1; i >= 0; i--) {
+              if (rooms[i].w > threshold && rooms[i].h > threshold) {
+                  rooms[i].isMain = 1;
                   mainVerts.push([rooms[i].x, rooms[i].y, i]);
+                  mainRoomsAmount++;
+                  if (mainRoomsAmount >= this.maxMainRoomsRate * this.roomsAmount) break;
+              }
+          }
+
+          if (mainRoomsAmount < this.minMainRoomsAmount) {
+              for (let i = rooms.length - 1; i >= 0; i--) {
+                  if (rooms[i].isMain !== 1) {
+                      rooms[i].isMain = 1;
+                      mainVerts.push([rooms[i].x, rooms[i].y, i]);
+                      mainRoomsAmount++;
+                      if (mainRoomsAmount >= this.minMainRoomsAmount) break;
+                  }
               }
           }
           return mainVerts;

@@ -7,16 +7,22 @@ class AppUi {
             dungeonSize: 13,
             roomSizeMean: 9,
             roomSizeDeviation: 0.5,
+            mainRoomThreshold: 1.1,
+            minMainRoomsAmount: 6,
+            maxMainRoomsRate: 0.14,
             connectivity: 0.55,
             fromDungeonId: false,
             dungeonId: ''
         };
 
-        const gui = new dat.GUI();
+        const gui = new dat.GUI({width: 400});
         gui.add(this.dungeonParams, 'roomSizeDistribution', { normal: 'normal', uniform: 'uniform' });
         gui.add(this.dungeonParams, 'dungeonSize').min(1).max(120).step(1);
         gui.add(this.dungeonParams, 'roomSizeMean').min(5).max(30).step(1);
         gui.add(this.dungeonParams, 'roomSizeDeviation').min(0.1).max(0.9).step(0.05);
+        gui.add(this.dungeonParams, 'mainRoomThreshold').min(0).max(2).step(0.01);
+        gui.add(this.dungeonParams, 'minMainRoomsAmount').min(1).max(25).step(1);
+        gui.add(this.dungeonParams, 'maxMainRoomsRate').min(0).max(1).step(0.01);
         gui.add(this.dungeonParams, 'connectivity').min(0).max(1).step(0.01);
         gui.add(this.dungeonParams, 'fromDungeonId');
         gui.add(this.dungeonParams, 'dungeonId').onChange().listen();
@@ -36,6 +42,9 @@ class AppUi {
         this.dungeonParams.roomSizeDistribution + ',' +
         this.dungeonParams.roomSizeMean + ',' +
         this.dungeonParams.roomSizeDeviation + ',' +
+        this.dungeonParams.mainRoomThreshold + ',' +
+        this.dungeonParams.minMainRoomsAmount + ',' +
+        this.dungeonParams.maxMainRoomsRate + ',' +
         this.dungeonParams.connectivity;
         return dungeonId;
     }

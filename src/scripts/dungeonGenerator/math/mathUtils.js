@@ -21,3 +21,10 @@ export function alignedSegmentRectangleCol(sx1, sy1, sx2, sy2, rx1, ry1, rx2, ry
 export function dSq(a, b) {
     return (a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]);
 }
+
+// normal distribution in [-3, 3]
+export function getBoxMullerGaussianNoise() {
+    const u = Math.random();
+    const v = Math.random();
+    return Math.max(Math.min(Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v), 3), -3);
+}

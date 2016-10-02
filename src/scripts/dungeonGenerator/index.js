@@ -9,17 +9,26 @@ import {processTriangulation, generateMST} from './math/graphUtils.js';
 const Delaunay = require('./math/delaunay.js');
 const seedRandom = require('seedrandom');
 
-// todo: minimum red rooms amount (room sizes distribution)
-// todo: maximum red rooms amount (room sizes distribution)
-// todo: >3 green on one tunnel -> offset and generetae pipe to it
-// todo: if one red room is very far from others -> add red room in between
-window.dungeonizer = window.dungeonizer || {};
-const generateDungeonImpl = function({seed, dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation, connectivity, debugData}) {
 
-    // const midRoomAspect = 1;
+// todo: dungeon/rooms aspect ratio
+// todo: >3 green on one tunnel -> offset and generetae pipe to it
+// todo: if one red room is very far from others -> add red room in between (?)
+window.dungeonizer = window.dungeonizer || {};
+const generateDungeonImpl = function({
+    seed,
+    dungeonSize,
+    roomSizeDistribution,
+    roomSizeMean,
+    roomSizeDeviation,
+    mainRoomThreshold,
+    minMainRoomsAmount,
+    maxMainRoomsRate,
+    connectivity,
+    debugData}) {
+
     seedRandom(seed, { global: true });
 
-    const rooms = new Rooms(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation);
+    const rooms = new Rooms(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation, mainRoomThreshold, minMainRoomsAmount, maxMainRoomsRate);
     rooms.generateRoomSizes();
     rooms.placeRooms();
     const mainRoomsCenters = rooms.chooseMainRooms(rooms.rooms);
@@ -58,7 +67,10 @@ window.dungeonizer.generateDungeonById = function(dungeonId, debugData) {
         roomSizeDistribution: params[2],
         roomSizeMean: parseInt(params[3], 10),
         roomSizeDeviation: parseFloat(params[4]),
-        connectivity: parseFloat(params[5]),
+        mainRoomThreshold: parseFloat(params[5]),
+        minMainRoomsAmount: parseInt(params[6], 10),
+        maxMainRoomsRate: parseFloat(params[7]),
+        connectivity: parseFloat(params[8]),
         debugData
     });
 };
