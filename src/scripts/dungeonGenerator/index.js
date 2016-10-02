@@ -13,6 +13,7 @@ const seedRandom = require('seedrandom');
 // todo: dungeon/rooms aspect ratio
 // todo: >3 green on one tunnel -> offset and generetae pipe to it
 // todo: if one red room is very far from others -> add red room in between (?)
+// todo: rooms density param
 window.dungeonizer = window.dungeonizer || {};
 const generateDungeonImpl = function({
     seed,
