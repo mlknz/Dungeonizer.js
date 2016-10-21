@@ -10,11 +10,9 @@ const Delaunay = require('./math/delaunay.js');
 const seedRandom = require('seedrandom');
 
 
-// todo: dungeon/rooms aspect ratio
-// todo: >3 green on one tunnel -> offset and generetae pipe to it
-// todo: if one red room is very far from others -> add red room in between (?)
-// todo: rooms density param
-window.dungeonizer = window.dungeonizer || {};
+// todo: all int values
+// todo: >2 green rooms on one tunnel -> offset and generate tunnel to it
+// todo: better tunnels placement
 const generateDungeonImpl = function({
     seed,
     dungeonSize,
@@ -25,7 +23,7 @@ const generateDungeonImpl = function({
     connectivity,
     density}) {
 
-    seedRandom(seed, { global: true });
+    seedRandom(seed, { global: true }); // replaces Math.random with seeded random
 
     const rooms = new Rooms(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation, mainRoomThreshold, density);
     rooms.generateRoomSizes();
@@ -49,6 +47,8 @@ const generateDungeonImpl = function({
     };
 };
 
+window.dungeonizer = window.dungeonizer || {};
+
 window.dungeonizer.generateDungeon = function(params) {
     console.log('Dungeon params:', params);
     // todo: check params validity (+default config)
@@ -59,8 +59,7 @@ window.dungeonizer.generateDungeon = function(params) {
 window.dungeonizer.generateDungeonById = function(dungeonId) {
     console.log('DungeonId:', dungeonId);
     const params = dungeonId.split(',');
-    // todo: check params validity (+default config)
-    return generateDungeonImpl({
+    return window.dungeonizer.generateDungeon({
         seed: params[0],
         dungeonSize: parseInt(params[1], 10),
         roomSizeDistribution: params[2],

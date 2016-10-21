@@ -18,7 +18,7 @@ class Rooms {
           switch (this.roomSizeDistribution) {
           default:
           case 'normal':
-              return getBoxMullerGaussianNoise() * (this.maxRoomSize - this.minRoomSize) / 6 + this.roomSizeMean + 0.5;
+              return getBoxMullerGaussianNoise() * (this.maxRoomSize - this.minRoomSize) / 6 + this.roomSizeMean;
           case 'uniform':
               return this.minRoomSize + Math.floor(Math.random() * (this.maxRoomSize - this.minRoomSize));
           }
@@ -27,8 +27,8 @@ class Rooms {
       generateRoomSizes() {
           let w, h, size;
           for (let i = 0; i < this.roomsAmount; i++) {
-              w = this.getDistributionPoint();
-              h = this.getDistributionPoint();
+              w = Math.round(this.getDistributionPoint());
+              h = Math.round(this.getDistributionPoint());
               size = w * h;
               this.rooms.push({x: 0, y: 0, w, h, size, x1: -w / 2, x2: w / 2, y1: -h / 2, y2: h / 2, isMain: 0});
           }
