@@ -34,6 +34,7 @@ const createDungeonShape = function(dungeon, dungeonId) {
     return root;
 };
 
+// todo: set bboxes for frustum culling
 window.dungeonizer = window.dungeonizer || {};
 window.dungeonizer.initVisualizer = function(renderer) {
 
@@ -56,9 +57,12 @@ window.dungeonizer.initVisualizer = function(renderer) {
     const light = new THREE.AmbientLight(0x202020);
     scene.add(light);
 
-    const dirLight = new THREE.DirectionalLight(0xaaaaaa);
+    const dirLight = new THREE.DirectionalLight(0x666666);
     dirLight.position.set(10, 20, 10);
     scene.add(dirLight);
+    const dirLight2 = new THREE.DirectionalLight(0x666666);
+    dirLight2.position.set(-30, 20, 10);
+    scene.add(dirLight2);
 
     return {
         scene,

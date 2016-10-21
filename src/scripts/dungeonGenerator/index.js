@@ -22,14 +22,12 @@ const generateDungeonImpl = function({
     roomSizeMean,
     roomSizeDeviation,
     mainRoomThreshold,
-    minMainRoomsAmount,
-    maxMainRoomsRate,
     connectivity,
-    debugData}) {
+    density}) {
 
     seedRandom(seed, { global: true });
 
-    const rooms = new Rooms(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation, mainRoomThreshold, minMainRoomsAmount, maxMainRoomsRate);
+    const rooms = new Rooms(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation, mainRoomThreshold, density);
     rooms.generateRoomSizes();
     rooms.placeRooms();
     const mainRoomsCenters = rooms.chooseMainRooms(rooms.rooms);
@@ -58,7 +56,7 @@ window.dungeonizer.generateDungeon = function(params) {
 };
 
 // todo: query string params?
-window.dungeonizer.generateDungeonById = function(dungeonId, debugData) {
+window.dungeonizer.generateDungeonById = function(dungeonId) {
     console.log('DungeonId:', dungeonId);
     const params = dungeonId.split(',');
     // todo: check params validity (+default config)
@@ -69,9 +67,7 @@ window.dungeonizer.generateDungeonById = function(dungeonId, debugData) {
         roomSizeMean: parseInt(params[3], 10),
         roomSizeDeviation: parseFloat(params[4]),
         mainRoomThreshold: parseFloat(params[5]),
-        minMainRoomsAmount: parseInt(params[6], 10),
-        maxMainRoomsRate: parseFloat(params[7]),
-        connectivity: parseFloat(params[8]),
-        debugData
+        connectivity: parseFloat(params[6]),
+        density: parseFloat(params[7])
     });
 };

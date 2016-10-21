@@ -1,13 +1,12 @@
 import {rectanglesCollided, getBoxMullerGaussianNoise} from './math/mathUtils.js';
 
 class Rooms {
-      constructor(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation, mainRoomThreshold, minMainRoomsAmount, maxMainRoomsRate) {
+      constructor(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation, mainRoomThreshold, density) {
           this.roomSizeDistribution = roomSizeDistribution;
           this.roomSizeMean = roomSizeMean;
           this.roomSizeDeviation = roomSizeDeviation;
           this.mainRoomThreshold = mainRoomThreshold;
-          this.minMainRoomsAmount = minMainRoomsAmount;
-          this.maxMainRoomsRate = maxMainRoomsRate;
+          this.density = density;
 
           this.minRoomSize = roomSizeMean * (1 - roomSizeDeviation);
           this.maxRoomSize = roomSizeMean * (1 + roomSizeDeviation);
@@ -65,14 +64,15 @@ class Rooms {
                   }
 
                   if (!collidedByAny) {
-                      // make a round trying to place closer to center
+                      // make a round trying to place room closer to center
                       let d = Math.sqrt(posX * posX + posY * posY);
                       let curAngle = roomAngle;
                       let curPosX, curPosY;
 
+                      const angleStep = 1 / d + (1 - this.density) * (2 * Math.PI - 1 / d);
+
                       while (curAngle - roomAngle < Math.PI * 2) {
-                          // curAngle += 1 / d;
-                          curAngle += Math.PI / 2; // todo: that is "density" param
+                          curAngle += angleStep;
 
                           for (let ii = d; ii > 0; ii--) {
                               curPosX = ii * Math.cos(curAngle);
@@ -118,20 +118,9 @@ class Rooms {
                   rooms[i].isMain = 1;
                   mainVerts.push([rooms[i].x, rooms[i].y, i]);
                   mainRoomsAmount++;
-                  if (mainRoomsAmount >= this.maxMainRoomsRate * this.roomsAmount) break;
               }
           }
 
-          if (mainRoomsAmount < this.minMainRoomsAmount) {
-              for (let i = rooms.length - 1; i >= 0; i--) {
-                  if (rooms[i].isMain !== 1) {
-                      rooms[i].isMain = 1;
-                      mainVerts.push([rooms[i].x, rooms[i].y, i]);
-                      mainRoomsAmount++;
-                      if (mainRoomsAmount >= this.minMainRoomsAmount) break;
-                  }
-              }
-          }
           return mainVerts;
       }
 

@@ -7,10 +7,9 @@ class AppUi {
             dungeonSize: 15,
             roomSizeMean: 9,
             roomSizeDeviation: 0.75,
-            mainRoomThreshold: 1.1,
-            minMainRoomsAmount: 6,
-            maxMainRoomsRate: 0.23,
+            mainRoomThreshold: 1.17,
             connectivity: 0.55,
+            density: 0.5,
             fromDungeonId: false,
             dungeonId: ''
         };
@@ -21,11 +20,10 @@ class AppUi {
         roomsFolder.add(this.dungeonParams, 'roomSizeDistribution', { normal: 'normal', uniform: 'uniform' });
         roomsFolder.add(this.dungeonParams, 'roomSizeMean').min(5).max(30).step(1);
         roomsFolder.add(this.dungeonParams, 'roomSizeDeviation').min(0.1).max(0.9).step(0.05);
-        roomsFolder.add(this.dungeonParams, 'mainRoomThreshold').min(0).max(2).step(0.01);
-        roomsFolder.add(this.dungeonParams, 'minMainRoomsAmount').min(1).max(25).step(1);
-        roomsFolder.add(this.dungeonParams, 'maxMainRoomsRate').min(0).max(1).step(0.01);
+        roomsFolder.add(this.dungeonParams, 'mainRoomThreshold').min(1).max(1.3).step(0.01);
         roomsFolder.open();
         gui.add(this.dungeonParams, 'connectivity').min(0).max(1).step(0.01);
+        gui.add(this.dungeonParams, 'density').min(0).max(1).step(0.01);
         gui.add(this.dungeonParams, 'fromDungeonId');
         gui.add(this.dungeonParams, 'dungeonId').onChange().listen();
 
@@ -45,9 +43,8 @@ class AppUi {
         this.dungeonParams.roomSizeMean + ',' +
         this.dungeonParams.roomSizeDeviation + ',' +
         this.dungeonParams.mainRoomThreshold + ',' +
-        this.dungeonParams.minMainRoomsAmount + ',' +
-        this.dungeonParams.maxMainRoomsRate + ',' +
-        this.dungeonParams.connectivity;
+        this.dungeonParams.connectivity + ',' +
+        this.dungeonParams.density;
         return dungeonId;
     }
 
@@ -55,7 +52,7 @@ class AppUi {
         const dungeonId = this.dungeonParams.fromDungeonId ? this.dungeonParams.dungeonId : this.generateNewDungeonId();
         this.dungeonParams.dungeonId = dungeonId;
 
-        const dungeon = window.dungeonizer.generateDungeonById(dungeonId, true);
+        const dungeon = window.dungeonizer.generateDungeonById(dungeonId);
         this.dungeonVisualizer.makeDungeonVisual(dungeon, dungeonId);
     }
 }
