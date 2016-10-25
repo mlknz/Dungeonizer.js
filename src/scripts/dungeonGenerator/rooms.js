@@ -1,4 +1,4 @@
-import {rectanglesCollided, getBoxMullerGaussianNoise} from './math/mathUtils.js';
+import {rectanglesTouched, getBoxMullerGaussianNoise} from './math/mathUtils.js';
 
 class Rooms {
       constructor(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation, mainRoomThreshold, density) {
@@ -30,8 +30,17 @@ class Rooms {
               w = Math.round(this.getDistributionPoint());
               h = Math.round(this.getDistributionPoint());
               size = w * h;
-              this.rooms.push({x: 0, y: 0, w, h, size, x1: -w / 2, x2: w / 2, y1: -h / 2, y2: h / 2, isMain: 0});
+              this.rooms.push({x: 0, y: 0, w, h, size, x1: 0, x2: 0, y1: 0, y2: 0, isMain: 0});
           }
+      }
+
+      integerizeRoomPlacement(room) {
+          room.x1 = Math.floor(-room.w / 2 + room.x);
+          room.x2 = room.x1 + room.w;
+          room.y1 = Math.floor(-room.h / 2 + room.y);
+          room.y2 = room.y1 + room.h;
+          room.x = (room.x1 + room.x2) / 2;
+          room.y = (room.y1 + room.y2) / 2;
       }
 
       placeRooms() {
@@ -54,10 +63,11 @@ class Rooms {
 
                   rooms[i].x = posX;
                   rooms[i].y = posY;
+                  this.integerizeRoomPlacement(rooms[i]);
 
                   let collidedByAny = false;
                   for (let j = 0; j < i; j++) {
-                      if (rectanglesCollided(rooms[j], rooms[i])) {
+                      if (rectanglesTouched(rooms[j], rooms[i])) {
                           collidedByAny = true;
                           break;
                       }
@@ -81,7 +91,9 @@ class Rooms {
                               for (let j = 0; j < i; j++) {
                                   rooms[i].x = curPosX;
                                   rooms[i].y = curPosY;
-                                  if (rectanglesCollided(rooms[j], rooms[i])) {
+                                  this.integerizeRoomPlacement(rooms[i]);
+
+                                  if (rectanglesTouched(rooms[j], rooms[i])) {
                                       collidedByAny = true;
                                       break;
                                   }
@@ -101,10 +113,7 @@ class Rooms {
                   }
               }
 
-              rooms[i].x1 = -rooms[i].w / 2 + rooms[i].x;
-              rooms[i].x2 = rooms[i].w / 2 + rooms[i].x;
-              rooms[i].y1 = -rooms[i].h / 2 + rooms[i].y;
-              rooms[i].y2 = rooms[i].h / 2 + rooms[i].y;
+              this.integerizeRoomPlacement(rooms[i]);
           }
       }
 
