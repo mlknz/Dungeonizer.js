@@ -25,7 +25,7 @@ class Tunnels {
                 for (let j = 0; j < tunnels.length; j = j + 4) {
                     if (alignedSegmentRectangleCol(tunnels[j], tunnels[j + 1], tunnels[j + 2], tunnels[j + 3],
                     room.x1, room.y1, room.x2, room.y2) !== false) {
-                        room.isMain = 2;
+                        room.isMain = 2; // todo: remove magic variable isMain
                         break;
                     }
                 }
@@ -40,7 +40,6 @@ class Tunnels {
     }
 
     generateTunnel(roomA, roomB) {
-        // room: x, y, w, h
         let tunnel = [];
         const dx = roomA.x - roomB.x;
         const dy = roomA.y - roomB.y;
@@ -49,26 +48,23 @@ class Tunnels {
 
         if (overlapX > 0) {
 
-            let x = roomA.x < roomB.x ? roomA.x + roomA.w / 2 : roomB.x + roomB.w / 2;
-            x -= (Math.random() * 0.6 + 0.2) * overlapX;
-
-            tunnel = dy < 0 ? [x, roomA.y + roomA.h / 2, x, roomB.y - roomB.h / 2] :
-                [x, roomA.y - roomA.h / 2, x, roomB.y + roomB.h / 2];
+            let x = roomA.x < roomB.x ? roomA.x2 : roomB.x2;
+            x -= Math.floor((Math.random() * 0.6 + 0.2) * overlapX);
+            tunnel = dy < 0 ? [x, roomA.y2, x, roomB.y1] : [x, roomA.y1, x, roomB.y2];
 
         } else if (overlapY > 0) {
 
-            let y = roomA.y < roomB.y ? roomA.y + roomA.h / 2 : roomB.y + roomB.h / 2;
-            y -= (Math.random() * 0.6 + 0.2) * overlapY;
-            tunnel = dx < 0 ? [roomA.x + roomA.w / 2, y, roomB.x - roomB.w / 2, y] :
-                [roomA.x - roomA.w / 2, y, roomB.x + roomB.w / 2, y];
+            let y = roomA.y < roomB.y ? roomA.y2 : roomB.y2;
+            y -= Math.floor((Math.random() * 0.6 + 0.2) * overlapY);
+            tunnel = dx < 0 ? [roomA.x2, y, roomB.x1, y] : [roomA.x1, y, roomB.x2, y];
 
         } else {
 
-            const y1 = dy < 0 ? roomA.y + roomA.h / 2 : roomA.y - roomA.h / 2;
-            const x1 = roomA.x + (Math.random() - 0.5) * roomA.w * 0.8;
+            const y1 = dy < 0 ? roomA.y2 : roomA.y1;
+            const x1 = roomA.x1 + Math.floor(Math.random() * 1.099 * roomA.w);
 
-            const x2 = dx < 0 ? roomB.x - roomB.w / 2 : roomB.x + roomB.w / 2;
-            const y2 = roomB.y + (Math.random() - 0.5) * roomB.h * 0.8;
+            const x2 = dx < 0 ? roomB.x1 : roomB.x2;
+            const y2 = roomB.y1 + Math.floor(Math.random() * 1.099 * roomB.h);
 
             tunnel = [x1, y1, x1, y2, x1, y2, x2, y2];
         }

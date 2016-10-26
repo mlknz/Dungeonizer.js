@@ -9,10 +9,8 @@ import {processTriangulation, generateMST} from './math/graphUtils.js';
 const Delaunay = require('./math/delaunay.js');
 const seedRandom = require('seedrandom');
 
-
-// todo: all int values
-// todo: >2 green rooms on one tunnel -> offset and generate tunnel to it
 // todo: better tunnels placement
+// todo: >2 green rooms on one tunnel -> offset and generate tunnel to it
 const generateDungeonImpl = function({
     seed,
     dungeonSize,
