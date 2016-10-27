@@ -1,4 +1,4 @@
-import {alignedSegmentRectangleCol} from './math/mathUtils.js';
+import {alignedSegmentRectangleCol, pointInsideRectangle} from './math/mathUtils.js';
 
 class Tunnels {
     constructor(rooms, edges, leftAlive, mainVerts) {
@@ -18,7 +18,7 @@ class Tunnels {
             Array.prototype.push.apply(tunnels, tunnel);
         }
 
-        this.markIntersectedRooms(rooms, tunnels);
+        this.attachRoomsCutTunnels(rooms, tunnels);
 
         return {
             tunnels,
@@ -65,17 +65,45 @@ class Tunnels {
         return tunnel;
     }
 
-    markIntersectedRooms(rooms, tunnels) {
+    attachRoomsCutTunnels(rooms, tunnels) {
         let room;
         for (let i = 0; i < rooms.length; i++) {
             room = rooms[i];
-            if (room.isMain < 1) {
-                for (let j = 0; j < tunnels.length; j = j + 4) {
+            for (let j = 0; j < tunnels.length; j = j + 4) {
+                if (!room.isMain) {
                     if (alignedSegmentRectangleCol(tunnels[j], tunnels[j + 1], tunnels[j + 2], tunnels[j + 3],
-                    room.x1, room.y1, room.x2, room.y2) !== false) {
-                        room.isMain = 2; // todo: remove magic variable isMain
-                        break;
+                    room.x1, room.y1, room.x2, room.y2)) {
+                        room.isAttached = true;
                     }
+                }
+                if (room.isMain || room.isAttached) {
+                    if (pointInsideRectangle(tunnels[j], tunnels[j + 1], room.x1, room.y1, room.x2, room.y2)) {
+                        const dx = tunnels[j + 2] - tunnels[j];
+                        const dy = tunnels[j + 3] - tunnels[j + 1];
+                        if (dx < -0.5) {
+                            tunnels[j] = room.x1;
+                        } else if (dx > 0.5) {
+                            tunnels[j] = room.x2;
+                        } else if (dy < - 0.5) {
+                            tunnels[j + 1] = room.y1;
+                        } else {
+                            tunnels[j + 1] = room.y2;
+                        }
+                    }
+                    if (pointInsideRectangle(tunnels[j + 2], tunnels[j + 3], room.x1, room.y1, room.x2, room.y2)) {
+                        const dx = -tunnels[j + 2] + tunnels[j];
+                        const dy = -tunnels[j + 3] + tunnels[j + 1];
+                        if (dx < -0.5) {
+                            tunnels[j + 2] = room.x1;
+                        } else if (dx > 0.5) {
+                            tunnels[j + 2] = room.x2;
+                        } else if (dy < - 0.5) {
+                            tunnels[j + 3] = room.y1;
+                        } else {
+                            tunnels[j + 3] = room.y2;
+                        }
+                    }
+                    // todo: cut pipes
                 }
             }
         }

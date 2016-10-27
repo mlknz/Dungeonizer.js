@@ -30,7 +30,7 @@ class Rooms {
               w = Math.round(this.getDistributionPoint());
               h = Math.round(this.getDistributionPoint());
               size = w * h;
-              this.rooms.push({x: w / 2, y: h / 2, w, h, size, x1: 0, x2: w, y1: 0, y2: h, isMain: 0});
+              this.rooms.push({x: w / 2, y: h / 2, w, h, size, x1: 0, x2: w, y1: 0, y2: h, isMain: false});
           }
       }
 
@@ -124,7 +124,7 @@ class Rooms {
           let mainRoomsAmount = 0;
           for (let i = rooms.length - 1; i >= 0; i--) {
               if (rooms[i].w > threshold && rooms[i].h > threshold) {
-                  rooms[i].isMain = 1;
+                  rooms[i].isMain = true;
                   mainVerts.push([rooms[i].x, rooms[i].y, i]);
                   mainRoomsAmount++;
               }

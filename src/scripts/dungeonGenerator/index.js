@@ -9,8 +9,7 @@ import {processTriangulation, generateMST} from './math/graphUtils.js';
 const Delaunay = require('./math/delaunay.js');
 const seedRandom = require('seedrandom');
 
-// todo: better tunnels placement
-// todo: >2 green rooms on one tunnel -> offset and generate tunnel to it
+// todo: >2 green rooms on one tunnel -> offset and generate tunnel to it (?)
 const generateDungeonImpl = function({
     seed,
     dungeonSize,
@@ -37,9 +36,9 @@ const generateDungeonImpl = function({
     const tunnels = new Tunnels(rooms.rooms, minSpanningTree.edges, minSpanningTree.leftAlive, mainRoomsCenters);
 
     return {
-        floors: rooms.rooms,
-        fullDelaunayTriangles: triangulation.triangulationLines,
-        triangles: tunnels.mstLines,
+        rooms: rooms.rooms,
+        delaunayTriangles: triangulation.triangulationLines,
+        mstLines: tunnels.mstLines,
         leftAliveLines: tunnels.leftAliveLines,
         tunnels: tunnels.tunnels
     };

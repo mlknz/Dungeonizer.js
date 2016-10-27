@@ -19,19 +19,19 @@ const createDungeonShape = function(dungeon, dungeonId) {
     const root = new THREE.Object3D();
     root.name = 'Dungeon_' + dungeonId;
 
-    const floorsMesh = new Floors(dungeon.floors);
-    floorsMesh.frustumCulled = false;
-    root.add(floorsMesh);
+    const roomsMesh = new Floors(dungeon.rooms);
+    roomsMesh.frustumCulled = false;
+    root.add(roomsMesh);
 
     const tunnelsMesh = new Tunnels(dungeon.tunnels);
     tunnelsMesh.frustumCulled = false;
     root.add(tunnelsMesh);
 
-    const trianglesMesh = new Lines(dungeon.triangles, 0x0000ff);
-    root.add(trianglesMesh);
+    const mstLinesMesh = new Lines(dungeon.mstLines, 0x0000ff);
+    root.add(mstLinesMesh);
 
-    const leftAliveMesh = new Lines(dungeon.leftAliveLines, 0x00ff00);
-    root.add(leftAliveMesh);
+    const leftAliveLinesMesh = new Lines(dungeon.leftAliveLines, 0x00ff00);
+    root.add(leftAliveLinesMesh);
 
     return root;
 };
@@ -58,17 +58,16 @@ window.dungeonizer.initVisualizer = function(renderer) {
     const light = new THREE.AmbientLight(0x202020);
     scene.add(light);
 
-    const dirLight = new THREE.DirectionalLight(0x666666);
+    const dirLight = new THREE.DirectionalLight(0x707070);
     dirLight.position.set(10, 20, 10);
     scene.add(dirLight);
-    const dirLight2 = new THREE.DirectionalLight(0x666666);
+    const dirLight2 = new THREE.DirectionalLight(0x707070);
     dirLight2.position.set(-30, 20, 10);
     scene.add(dirLight2);
 
     return {
         scene,
         update() {
-            // const time = (new Date()).getTime();
             controls.update();
             renderer.render(scene, camera);
         },

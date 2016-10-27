@@ -4,18 +4,22 @@ export function rectanglesTouched(a, b) {
     return false;
 }
 
-export function alignedSegmentRectangleCol(sx1, sy1, sx2, sy2, rx1, ry1, rx2, ry2) {
-    if (sx1 > Math.min(rx1, rx2) && sx1 < Math.max(rx1, rx2)) {
+export function alignedSegmentRectangleCol(sx1, sy1, sx2, sy2, x1, y1, x2, y2) {
+    if (sx1 > Math.min(x1, x2) && sx1 < Math.max(x1, x2)) {
         if (
-            (ry1 > Math.min(sy1, sy2) && ry1 < Math.max(sy1, sy2)) || ((ry2 > Math.min(sy1, sy2) && ry2 < Math.max(sy1, sy2)))) {
+            (y1 > Math.min(sy1, sy2) && y1 < Math.max(sy1, sy2)) || ((y2 > Math.min(sy1, sy2) && y2 < Math.max(sy1, sy2)))) {
             return true;
         }
-    } else if (sy1 > Math.min(ry1, ry2) && sy1 < Math.max(ry1, ry2)) {
-        if ((rx1 > Math.min(sx1, sx2) && rx1 < Math.max(sx1, sx2)) || ((rx2 > Math.min(sx1, sx2) && rx2 < Math.max(sx1, sx2)))) {
+    } else if (sy1 > Math.min(y1, y2) && sy1 < Math.max(y1, y2)) {
+        if ((x1 > Math.min(sx1, sx2) && x1 < Math.max(sx1, sx2)) || ((x2 > Math.min(sx1, sx2) && x2 < Math.max(sx1, sx2)))) {
             return true;
         }
     }
     return false;
+}
+
+export function pointInsideRectangle(px, py, x1, y1, x2, y2) {
+    return px > x1 && px < x2 && py > y1 && py < y2;
 }
 
 export function dSq(a, b) {
