@@ -20,9 +20,11 @@ const createDungeonShape = function(dungeon, dungeonId) {
     root.name = 'Dungeon_' + dungeonId;
 
     const floorsMesh = new Floors(dungeon.floors);
+    floorsMesh.frustumCulled = false;
     root.add(floorsMesh);
 
     const tunnelsMesh = new Tunnels(dungeon.tunnels);
+    tunnelsMesh.frustumCulled = false;
     root.add(tunnelsMesh);
 
     const trianglesMesh = new Lines(dungeon.triangles, 0x0000ff);
@@ -34,7 +36,6 @@ const createDungeonShape = function(dungeon, dungeonId) {
     return root;
 };
 
-// todo: set bboxes for frustum culling
 window.dungeonizer = window.dungeonizer || {};
 window.dungeonizer.initVisualizer = function(renderer) {
 
