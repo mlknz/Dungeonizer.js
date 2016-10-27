@@ -28,10 +28,10 @@ const createDungeonShape = function(dungeon, dungeonId) {
     root.add(tunnelsMesh);
 
     const mstLinesMesh = new Lines(dungeon.mstLines, 0x0000ff);
-    root.add(mstLinesMesh);
+    // root.add(mstLinesMesh);
 
     const leftAliveLinesMesh = new Lines(dungeon.leftAliveLines, 0x00ff00);
-    root.add(leftAliveLinesMesh);
+    // root.add(leftAliveLinesMesh);
 
     return root;
 };
