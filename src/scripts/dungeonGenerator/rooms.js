@@ -30,7 +30,7 @@ class Rooms {
               w = Math.round(this.getDistributionPoint());
               h = Math.round(this.getDistributionPoint());
               size = w * h;
-              this.rooms.push({x: 0, y: 0, w, h, size, x1: 0, x2: w, y1: 0, y2: h, isMain: 0});
+              this.rooms.push({x: w / 2, y: h / 2, w, h, size, x1: 0, x2: w, y1: 0, y2: h, isMain: 0});
           }
       }
 

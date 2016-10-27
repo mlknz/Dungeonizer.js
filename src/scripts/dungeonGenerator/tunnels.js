@@ -52,11 +52,13 @@ class Tunnels {
 
         } else {
 
-            const y1 = dy < 0 ? roomA.y2 : roomA.y1;
-            const x1 = roomA.x1 + Math.floor(Math.random() * 1.099 * roomA.w);
+            const y1 = dy > 0 ? roomA.y1 : roomA.y2;
+            const xRange = Math.floor((0.15 + Math.random() * 0.5) * roomA.w);
+            const x1 = dx > 0 ? roomA.x1 + xRange : roomA.x2 - xRange;
 
-            const x2 = dx < 0 ? roomB.x1 : roomB.x2;
-            const y2 = roomB.y1 + Math.floor(Math.random() * 1.099 * roomB.h);
+            const x2 = dx > 0 ? roomB.x2 : roomB.x1;
+            const yRange = Math.floor((0.15 + Math.random() * 0.5) * roomB.h);
+            const y2 = dy < 0 ? roomB.y1 + yRange : roomB.y2 - yRange;
 
             tunnel = [x1, y1, x1, y2, x1, y2, x2, y2];
         }
