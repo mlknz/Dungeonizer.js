@@ -10,6 +10,7 @@ const Delaunay = require('./math/delaunay.js');
 const seedRandom = require('seedrandom');
 
 // todo: better tunnels placement
+// todo: first room unchecked for collision
 // todo: >2 green rooms on one tunnel -> offset and generate tunnel to it
 const generateDungeonImpl = function({
     seed,

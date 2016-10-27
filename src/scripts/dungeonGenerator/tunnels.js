@@ -18,6 +18,52 @@ class Tunnels {
             Array.prototype.push.apply(tunnels, tunnel);
         }
 
+        this.markIntersectedRooms(rooms, tunnels);
+
+        return {
+            tunnels,
+            mstLines,
+            leftAliveLines
+        };
+    }
+
+    generateTunnel(roomA, roomB) {
+        let tunnel = [];
+
+        const dx = roomA.x - roomB.x;
+        const dy = roomA.y - roomB.y;
+        const overlapX = (roomA.w + roomB.w) / 2 - Math.abs(dx);
+        const overlapY = (roomA.h + roomB.h) / 2 - Math.abs(dy);
+
+        const rightRoom = dx > 0 ? roomA : roomB;
+        const leftRoom = dx > 0 ? roomB : roomA;
+        const upRoom = dy > 0 ? roomA : roomB;
+        const downRoom = dy > 0 ? roomB : roomA;
+
+        if (overlapX > 0) {
+
+            const x = rightRoom.x1 + Math.floor((Math.random() * 0.6 + 0.3) * overlapX);
+            tunnel = [x, upRoom.y1, x, downRoom.y2];
+
+        } else if (overlapY > 0) {
+
+            const y = upRoom.y1 + Math.floor((Math.random() * 0.6 + 0.3) * overlapY);
+            tunnel = [rightRoom.x1, y, leftRoom.x2, y];
+
+        } else {
+
+            const y1 = dy < 0 ? roomA.y2 : roomA.y1;
+            const x1 = roomA.x1 + Math.floor(Math.random() * 1.099 * roomA.w);
+
+            const x2 = dx < 0 ? roomB.x1 : roomB.x2;
+            const y2 = roomB.y1 + Math.floor(Math.random() * 1.099 * roomB.h);
+
+            tunnel = [x1, y1, x1, y2, x1, y2, x2, y2];
+        }
+        return tunnel;
+    }
+
+    markIntersectedRooms(rooms, tunnels) {
         let room;
         for (let i = 0; i < rooms.length; i++) {
             room = rooms[i];
@@ -31,44 +77,6 @@ class Tunnels {
                 }
             }
         }
-
-        return {
-            tunnels,
-            mstLines,
-            leftAliveLines
-        };
-    }
-
-    generateTunnel(roomA, roomB) {
-        let tunnel = [];
-        const dx = roomA.x - roomB.x;
-        const dy = roomA.y - roomB.y;
-        const overlapX = (roomA.w + roomB.w) / 2 - Math.abs(dx);
-        const overlapY = (roomA.h + roomB.h) / 2 - Math.abs(dy);
-
-        if (overlapX > 0) {
-
-            let x = roomA.x < roomB.x ? roomA.x2 : roomB.x2;
-            x -= Math.floor((Math.random() * 0.6 + 0.2) * overlapX);
-            tunnel = dy < 0 ? [x, roomA.y2, x, roomB.y1] : [x, roomA.y1, x, roomB.y2];
-
-        } else if (overlapY > 0) {
-
-            let y = roomA.y < roomB.y ? roomA.y2 : roomB.y2;
-            y -= Math.floor((Math.random() * 0.6 + 0.2) * overlapY);
-            tunnel = dx < 0 ? [roomA.x2, y, roomB.x1, y] : [roomA.x1, y, roomB.x2, y];
-
-        } else {
-
-            const y1 = dy < 0 ? roomA.y2 : roomA.y1;
-            const x1 = roomA.x1 + Math.floor(Math.random() * 1.099 * roomA.w);
-
-            const x2 = dx < 0 ? roomB.x1 : roomB.x2;
-            const y2 = roomB.y1 + Math.floor(Math.random() * 1.099 * roomB.h);
-
-            tunnel = [x1, y1, x1, y2, x1, y2, x2, y2];
-        }
-        return tunnel;
     }
 }
 
