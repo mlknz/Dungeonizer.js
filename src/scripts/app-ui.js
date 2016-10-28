@@ -1,18 +1,10 @@
+import config from './dungeonGenerator/config.js';
+
 class AppUi {
     constructor(dungeonVisualizer) {
         this.dungeonVisualizer = dungeonVisualizer;
 
-        this.dungeonParams = {
-            roomSizeDistribution: 'normal',
-            dungeonSize: 15,
-            roomSizeMean: 9,
-            roomSizeDeviation: 0.75,
-            mainRoomThreshold: 1.1,
-            connectivity: 0.55,
-            density: 0.3,
-            fromDungeonId: false,
-            dungeonId: ''
-        };
+        this.dungeonParams = config.dungeonParams;
 
         const gui = new dat.GUI({width: 400});
         gui.add(this.dungeonParams, 'dungeonSize').min(1).max(120).step(1);

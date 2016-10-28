@@ -1,7 +1,7 @@
 if (module.hot) {
     module.hot.accept();
 }
-
+import config from './config.js';
 import Rooms from './rooms.js';
 import Tunnels from './tunnels.js';
 import {processTriangulation, generateMST} from './math/graphUtils.js';
@@ -9,7 +9,6 @@ import {processTriangulation, generateMST} from './math/graphUtils.js';
 const Delaunay = require('./math/delaunay.js');
 const seedRandom = require('seedrandom');
 
-// todo: >2 green rooms on one tunnel -> offset and generate tunnel to it (?)
 const generateDungeonImpl = function({
     seed,
     dungeonSize,
@@ -46,15 +45,29 @@ const generateDungeonImpl = function({
     };
 };
 
+const mergeParamsWithDefaults = function(params) {
+    const corrected = {};
+
+    corrected.connectivity = isNaN(params.connectivity) ? config.dungeonParams.connectivity : params.connectivity;
+    corrected.density = isNaN(params.density) ? config.dungeonParams.density : params.density;
+    corrected.dungeonSize = isNaN(params.dungeonSize) ? config.dungeonParams.dungeonSize : params.dungeonSize;
+    corrected.mainRoomThreshold = isNaN(params.mainRoomThreshold) ? config.dungeonParams.mainRoomThreshold : params.mainRoomThreshold;
+    corrected.roomSizeDeviation = isNaN(params.roomSizeDeviation) ? config.dungeonParams.roomSizeDeviation : params.roomSizeDeviation;
+    corrected.roomSizeDistribution = isNaN(params.roomSizeDistribution) ? config.dungeonParams.roomSizeDistribution : params.roomSizeDistribution;
+    corrected.roomSizeMean = isNaN(params.roomSizeMean) ? config.dungeonParams.roomSizeMean : params.roomSizeMean;
+    corrected.seed = params.seed || (Math.random() + 1).toString(36).substring(7, 16);
+
+    return corrected;
+};
+
 window.dungeonizer = window.dungeonizer || {};
 
 window.dungeonizer.generateDungeon = function(params) {
-    console.log('Dungeon params:', params);
-    // todo: check params validity (+default config)
-    return generateDungeonImpl(params);
+    const correctedParams = mergeParamsWithDefaults(params);
+    console.log('Dungeon params:', correctedParams);
+    return generateDungeonImpl(correctedParams);
 };
 
-// todo: query string params?
 window.dungeonizer.generateDungeonById = function(dungeonId) {
     console.log('DungeonId:', dungeonId);
     const params = dungeonId.split(',');
