@@ -19,7 +19,6 @@ class Tunnels {
         }
 
         this.attachRoomsCutTunnels(rooms, tunnels);
-        this.attachRoomsCutTunnels(rooms, tunnels); // todo: VERY TEMPORARY :D
 
         return {
             tunnels,
@@ -72,32 +71,40 @@ class Tunnels {
         for (let i = 0; i < rooms.length; i++) {
             room = rooms[i];
             for (let j = 0; j < tunnels.length; j = j + 4) {
-                const dx = tunnels[j + 2] - tunnels[j];
-                const dy = tunnels[j + 3] - tunnels[j + 1];
                 if (!room.isMain) {
                     if (alignedSegmentRectangleCol(tunnels[j], tunnels[j + 1], tunnels[j + 2], tunnels[j + 3],
                     room.x1, room.y1, room.x2, room.y2)) {
                         room.isAttached = true;
                     }
                 }
+            }
+
+            for (let j = 0; j < tunnels.length; j += 4) {
+                const dx = tunnels[j + 2] - tunnels[j];
+                const dy = tunnels[j + 3] - tunnels[j + 1];
+                const leftRight = dx < 0;
+                const rightLeft = dx > 0;
+                const downUp = dy < 0;
+                const upDown = dy > 0;
+
                 if (room.isMain || room.isAttached) {
                     if (pointInsideRectangle(tunnels[j], tunnels[j + 1], room.x1, room.y1, room.x2, room.y2)) {
-                        if (dx < -0.5) { // todo: change that mess to sign()
+                        if (leftRight) {
                             tunnels[j] = room.x1;
-                        } else if (dx > 0.5) {
+                        } else if (rightLeft) {
                             tunnels[j] = room.x2;
-                        } else if (dy < - 0.5) {
+                        } else if (downUp) {
                             tunnels[j + 1] = room.y1;
                         } else {
                             tunnels[j + 1] = room.y2;
                         }
                     }
                     if (pointInsideRectangle(tunnels[j + 2], tunnels[j + 3], room.x1, room.y1, room.x2, room.y2)) {
-                        if (-dx < -0.5) {
+                        if (rightLeft) {
                             tunnels[j + 2] = room.x1;
-                        } else if (-dx > 0.5) {
+                        } else if (leftRight) {
                             tunnels[j + 2] = room.x2;
-                        } else if (-dy < - 0.5) {
+                        } else if (upDown) {
                             tunnels[j + 3] = room.y1;
                         } else {
                             tunnels[j + 3] = room.y2;
@@ -106,15 +113,15 @@ class Tunnels {
 
                     if (alignedSegmentRectangleCol(tunnels[j], tunnels[j + 1], tunnels[j + 2], tunnels[j + 3],
                     room.x1, room.y1, room.x2, room.y2)) {
-                        if (dx > 0.5) {
+                        if (rightLeft) {
                             t = tunnels[j + 2];
                             tunnels[j + 2] = room.x1;
                             tunnels.push(room.x2, tunnels[j + 1], t, tunnels[j + 3]);
-                        } else if (dx < -0.5) {
+                        } else if (leftRight) {
                             t = tunnels[j];
                             tunnels[j] = room.x1;
                             tunnels.push(room.x2, tunnels[j + 1], t, tunnels[j + 3]);
-                        } else if (dy > 0.5) {
+                        } else if (upDown) {
                             t = tunnels[j + 3];
                             tunnels[j + 3] = room.y1;
                             tunnels.push(tunnels[j], room.y2, tunnels[j + 2], t);

@@ -7,6 +7,7 @@ class Rooms {
           this.roomSizeDeviation = roomSizeDeviation;
           this.mainRoomThreshold = mainRoomThreshold;
           this.density = density;
+          this.maxRoomRoundStepsAmount = 30;
 
           this.minRoomSize = roomSizeMean * (1 - roomSizeDeviation);
           this.maxRoomSize = roomSizeMean * (1 + roomSizeDeviation);
@@ -79,7 +80,8 @@ class Rooms {
                       let curAngle = roomAngle;
                       let curPosX, curPosY;
 
-                      const angleStep = 1 / d + (1 - this.density) * (2 * Math.PI - 1 / d);
+                      const maxStepsAmount = Math.min(d, this.maxRoomRoundStepsAmount);
+                      const angleStep = 1 / maxStepsAmount + (1 - this.density) * (2 * Math.PI - 1 / maxStepsAmount);
 
                       while (curAngle - roomAngle < Math.PI * 2) {
                           curAngle += angleStep;
