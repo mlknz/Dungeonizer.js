@@ -21,7 +21,7 @@ class AppUi {
         roomsFolder.add(this.dungeonParams, 'roomSizeMean').min(5).max(30).step(1);
         roomsFolder.add(this.dungeonParams, 'roomSizeDeviation').min(0.1).max(0.9).step(0.01);
         roomsFolder.add(this.dungeonParams, 'mainRoomThreshold').min(1).max(1.33).step(0.01);
-        roomsFolder.open();
+        // roomsFolder.open();
         gui.add(this.dungeonParams, 'connectivity').min(0).max(1).step(0.01);
         gui.add(this.dungeonParams, 'density').min(0).max(1).step(0.01);
         gui.add(this.dungeonParams, 'fromDungeonId');

@@ -3,28 +3,20 @@ import {alignedSegmentRectangleCol, pointInsideRectangle} from './math/mathUtils
 class Tunnels {
     constructor(rooms, edges, leftAlive, mainVerts) {
         let tunnel;
-        const tunnels = [];
-        const mstLines = [];
+        this.tunnels = [];
+        this.mstLines = [];
 
         for (let i = 0; i < edges.length; i++) {
-            mstLines.push(mainVerts[edges[i].a][0], mainVerts[edges[i].a][1], mainVerts[edges[i].b][0], mainVerts[edges[i].b][1]);
+            this.mstLines.push(mainVerts[edges[i].a][0], mainVerts[edges[i].a][1], mainVerts[edges[i].b][0], mainVerts[edges[i].b][1]);
             tunnel = this.generateTunnel(rooms[mainVerts[edges[i].a][2]], rooms[mainVerts[edges[i].b][2]]);
-            Array.prototype.push.apply(tunnels, tunnel);
+            Array.prototype.push.apply(this.tunnels, tunnel);
         }
-        const leftAliveLines = [];
+        this.leftAliveLines = [];
         for (let i = 0; i < leftAlive.length; i++) {
-            leftAliveLines.push(mainVerts[leftAlive[i].a][0], mainVerts[leftAlive[i].a][1], mainVerts[leftAlive[i].b][0], mainVerts[leftAlive[i].b][1]);
+            this.leftAliveLines.push(mainVerts[leftAlive[i].a][0], mainVerts[leftAlive[i].a][1], mainVerts[leftAlive[i].b][0], mainVerts[leftAlive[i].b][1]);
             tunnel = this.generateTunnel(rooms[mainVerts[leftAlive[i].a][2]], rooms[mainVerts[leftAlive[i].b][2]]);
-            Array.prototype.push.apply(tunnels, tunnel);
+            Array.prototype.push.apply(this.tunnels, tunnel);
         }
-
-        this.attachRoomsCutTunnels(rooms, tunnels);
-
-        return {
-            tunnels,
-            mstLines,
-            leftAliveLines
-        };
     }
 
     generateTunnel(roomA, roomB) {
@@ -65,20 +57,11 @@ class Tunnels {
         return tunnel;
     }
 
-    attachRoomsCutTunnels(rooms, tunnels) {
+    cutTunnels(rooms, tunnels) {
         let room;
         let t;
         for (let i = 0; i < rooms.length; i++) {
             room = rooms[i];
-            for (let j = 0; j < tunnels.length; j = j + 4) {
-                if (!room.isMain) {
-                    if (alignedSegmentRectangleCol(tunnels[j], tunnels[j + 1], tunnels[j + 2], tunnels[j + 3],
-                    room.x1, room.y1, room.x2, room.y2)) {
-                        room.isAttached = true;
-                    }
-                }
-            }
-
             for (let j = 0; j < tunnels.length; j += 4) {
                 const dx = tunnels[j + 2] - tunnels[j];
                 const dy = tunnels[j + 3] - tunnels[j + 1];
@@ -135,6 +118,7 @@ class Tunnels {
             }
         }
     }
+
 }
 
 export default Tunnels;

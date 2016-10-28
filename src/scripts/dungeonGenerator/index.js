@@ -34,6 +34,8 @@ const generateDungeonImpl = function({
     const minSpanningTree = generateMST(triangulation.edges, triangulation.gVerts, leaveExtraEdgeOneFrom);
 
     const tunnels = new Tunnels(rooms.rooms, minSpanningTree.edges, minSpanningTree.leftAlive, mainRoomsCenters);
+    rooms.attachIntersectedRooms(rooms.rooms, tunnels.tunnels);
+    tunnels.cutTunnels(rooms.rooms, tunnels.tunnels);
 
     return {
         rooms: rooms.rooms,

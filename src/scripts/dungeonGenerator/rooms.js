@@ -1,4 +1,4 @@
-import {rectanglesTouched, getBoxMullerGaussianNoise} from './math/mathUtils.js';
+import {rectanglesTouched, getBoxMullerGaussianNoise, alignedSegmentRectangleCol} from './math/mathUtils.js';
 
 class Rooms {
       constructor(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation, mainRoomThreshold, density) {
@@ -133,6 +133,21 @@ class Rooms {
           }
 
           return mainVerts;
+      }
+
+      attachIntersectedRooms(rooms, tunnels) {
+          let room;
+          for (let i = 0; i < rooms.length; i++) {
+              room = rooms[i];
+              for (let j = 0; j < tunnels.length; j = j + 4) {
+                  if (!room.isMain) {
+                      if (alignedSegmentRectangleCol(tunnels[j], tunnels[j + 1], tunnels[j + 2], tunnels[j + 3],
+                      room.x1, room.y1, room.x2, room.y2)) {
+                          room.isAttached = true;
+                      }
+                  }
+              }
+          }
       }
 
 }
