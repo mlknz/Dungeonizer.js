@@ -38,6 +38,9 @@ const generateDungeonImpl = function({
     tunnels.cutTunnels(rooms.rooms, tunnels.tunnels);
 
     const walls = new Walls(rooms.rooms, tunnels.tunnels);
+    walls.removeWallWallIntersections();
+    // walls.removeTunnelWallIntersections(tunnels.tunnels);
+    // walls.removeRoomWallIntersections(rooms.rooms);
 
     return {
         rooms: rooms.rooms,
@@ -45,7 +48,7 @@ const generateDungeonImpl = function({
         mstLines: tunnels.mstLines,
         leftAliveLines: tunnels.leftAliveLines,
         tunnels: tunnels.tunnels,
-        walls
+        walls: walls.walls
     };
 };
 

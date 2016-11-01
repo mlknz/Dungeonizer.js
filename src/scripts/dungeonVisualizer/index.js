@@ -15,7 +15,7 @@ const clearScene = function(scene) {
     });
 };
 
-const createDungeonShape = function(dungeon, dungeonId) {
+const createDungeonMesh = function(dungeon, dungeonId) {
     const root = new THREE.Object3D();
     root.name = 'Dungeon_' + dungeonId;
 
@@ -27,7 +27,7 @@ const createDungeonShape = function(dungeon, dungeonId) {
     tunnelsMesh.frustumCulled = false;
     root.add(tunnelsMesh);
 
-    const wallsMesh = new Tunnels(dungeon.walls);
+    const wallsMesh = new Tunnels(dungeon.walls, true);
     wallsMesh.frustumCulled = false;
     root.add(wallsMesh);
 
@@ -88,7 +88,7 @@ window.dungeonizer.initVisualizer = function(renderer) {
         },
         makeDungeonVisual(dungeon, dungeonId) {
             clearScene(scene);
-            const dungeonShape = createDungeonShape(dungeon, dungeonId);
+            const dungeonShape = createDungeonMesh(dungeon, dungeonId);
             scene.add(dungeonShape);
         }
     };

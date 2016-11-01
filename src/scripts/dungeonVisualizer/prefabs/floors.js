@@ -28,7 +28,7 @@ class Floors {
         geom.addAttribute('metaInfo', new THREE.InstancedBufferAttribute(new Float32Array(metaInfo), 1, 1));
 
         const uniforms = THREE.UniformsUtils.clone(THREE.UniformsLib.lights);
-
+        uniforms.overwriteColor = {value: new THREE.Vector3(-10)};
         const floorsMaterial = new THREE.RawShaderMaterial({
             uniforms,
             vertexShader: floorsVert,

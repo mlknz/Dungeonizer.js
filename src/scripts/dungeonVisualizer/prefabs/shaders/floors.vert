@@ -10,6 +10,7 @@ uniform mat4 projectionMatrix;
 
 varying vec3 vNormal;
 varying float vIsMain;
+varying vec3 nothing;
 
 void main() {
     mat4 modelMat = mat4(
@@ -22,4 +23,5 @@ void main() {
 
 	vNormal = mat3(viewMatrix * modelMat) * normal;
 	vIsMain = metaInfo;
+    nothing = offset;
 }

@@ -5,7 +5,7 @@ const tunnelHeight = 1.7;
 const tunnelWidth = 1.2;
 
 class Tunnels {
-    constructor(tunnels) {
+    constructor(tunnels, colorFlag) {
         const offsets = [];
         const scales = [];
         const metaInfo = [];
@@ -20,7 +20,7 @@ class Tunnels {
             isHorizontal = Math.abs(x2 - x1) > Math.abs(y2 - y1);
             scales.push(
                 isHorizontal ? Math.abs(x2 - x1) + tunnelWidth / 2 : tunnelWidth,
-                tunnelHeight,
+                colorFlag ? 5 : tunnelHeight,
                 isHorizontal ? tunnelWidth : Math.abs(y2 - y1) + tunnelWidth / 2
             );
             metaInfo.push(-1);
@@ -37,6 +37,7 @@ class Tunnels {
         geom.addAttribute('metaInfo', new THREE.InstancedBufferAttribute(new Float32Array(metaInfo), 1, 1));
 
         const uniforms = THREE.UniformsUtils.clone(THREE.UniformsLib.lights);
+        uniforms.overwriteColor = {value: new THREE.Vector3(-10)};
 
         const floorsMaterial = new THREE.RawShaderMaterial({
             uniforms,
@@ -46,6 +47,8 @@ class Tunnels {
             transparent: false,
             lights: true
         });
+
+        if (colorFlag) floorsMaterial.uniforms.overwriteColor.value.x = 20;
 
         return new THREE.Mesh(geom, floorsMaterial);
     }
