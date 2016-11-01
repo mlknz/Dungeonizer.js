@@ -27,6 +27,10 @@ const createDungeonShape = function(dungeon, dungeonId) {
     tunnelsMesh.frustumCulled = false;
     root.add(tunnelsMesh);
 
+    const wallsMesh = new Tunnels(dungeon.walls);
+    wallsMesh.frustumCulled = false;
+    root.add(wallsMesh);
+
     const mstLinesMesh = new Lines(dungeon.mstLines, 0x0000ff);
     // root.add(mstLinesMesh);
 

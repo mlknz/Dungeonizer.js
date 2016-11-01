@@ -4,6 +4,7 @@ if (module.hot) {
 import config from './config.js';
 import Rooms from './rooms.js';
 import Tunnels from './tunnels.js';
+import Walls from './walls.js';
 import {processTriangulation, generateMST} from './math/graphUtils.js';
 
 const Delaunay = require('./math/delaunay.js');
@@ -36,12 +37,15 @@ const generateDungeonImpl = function({
     rooms.attachIntersectedRooms(rooms.rooms, tunnels.tunnels);
     tunnels.cutTunnels(rooms.rooms, tunnels.tunnels);
 
+    const walls = new Walls(rooms.rooms, tunnels.tunnels);
+
     return {
         rooms: rooms.rooms,
         delaunayTriangles: triangulation.triangulationLines,
         mstLines: tunnels.mstLines,
         leftAliveLines: tunnels.leftAliveLines,
-        tunnels: tunnels.tunnels
+        tunnels: tunnels.tunnels,
+        walls
     };
 };
 
