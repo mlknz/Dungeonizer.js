@@ -9,6 +9,7 @@ class Walls {
                 Array.prototype.push.apply(walls, roomPerimeter);
             }
         }
+
         for (let i = 0; i < tunnels.length; i += 4) {
             const tunnelWalls = this.createTunnelWall(
                 Math.min(tunnels[i], tunnels[i + 2]),
@@ -23,7 +24,7 @@ class Walls {
     }
 
     createRoomPerimeterWall(room) {
-        const x1 = room.x - room.w / 2;
+        const x1 = room.x - room.w / 2; // todo: +/- 1's
         const x2 = room.x + room.w / 2;
         const y1 = room.y - room.h / 2;
         const y2 = room.y + room.h / 2;
@@ -87,10 +88,10 @@ class Walls {
                         walls[j + 2] = pieces.C[2];
                         walls[j + 3] = pieces.C[3];
                     } else { // neither B nor C
-                        walls[j] = 10000;
-                        walls[j + 1] = 10000;
-                        walls[j + 2] = 10000;
-                        walls[j + 3] = 10000;
+                        walls[j] = 10000 + i;
+                        walls[j + 1] = 10000 + i;
+                        walls[j + 2] = 10000 + i + 1;
+                        walls[j + 3] = 10000 + i + 1;
                     }
                 }
             }
@@ -101,16 +102,18 @@ class Walls {
     removeRoomWallIntersections(rooms) {
         const innerPerimeters = [];
         for (let i = 0; i < rooms.length; i++) {
-            const x1 = rooms[i].x - rooms[i].w / 2 + 1;
-            const x2 = rooms[i].x + rooms[i].w / 2 - 1;
-            const y1 = rooms[i].y - rooms[i].h / 2 + 1;
-            const y2 = rooms[i].y + rooms[i].h / 2 - 1;
-            innerPerimeters.push(
-                x1, y1, x1, y2,
-                x1, y2, x2, y2,
-                x2, y2, x2, y1,
-                x2, y1, x1, y1
-            );
+            if (rooms[i].isMain || rooms[i].isAttached) {
+                const x1 = rooms[i].x - rooms[i].w / 2 + 1;
+                const x2 = rooms[i].x + rooms[i].w / 2 - 1;
+                const y1 = rooms[i].y - rooms[i].h / 2 + 1;
+                const y2 = rooms[i].y + rooms[i].h / 2 - 1;
+                innerPerimeters.push(
+                    x1, y1, x1, y2,
+                    x1, y2, x2, y2,
+                    x2, y2, x2, y1,
+                    x2, y1, x1, y1
+                );
+            }
         }
         this.removeTunnelWallIntersections(innerPerimeters);
     }
@@ -121,7 +124,7 @@ class Walls {
         let newWallsAmount = walls.length - startWallsLength;
 
         while (newWallsAmount > 0) {
-            console.log('going inside');
+            console.log('going inside', walls.length);
             startWallsLength = walls.length;
             for (let i = 0; i < walls.length; i += 4) {
                 for (let j = 0; j < i; j += 4) {
@@ -152,36 +155,57 @@ class Walls {
                         walls[i + 2] = pieces.C[2];
                         walls[i + 3] = pieces.C[3];
                     } else { // neither B nor C
-                        walls[i] = 10000; // yes, very temporary
-                        walls[i + 1] = 10000;
-                        walls[i + 2] = 100001;
-                        walls[i + 3] = 100001;
+                        // console.log(pieces);
+                        walls[i] = 10000 + 4 * i;
+                        walls[i + 1] = 10000 + 4 * i;
+                        walls[i + 2] = 10000 + 4 * i + 1;
+                        walls[i + 3] = 10000 + 4 * i + 1;
                     }
                 }
             }
+
+
             newWallsAmount = walls.length - startWallsLength;
         }
+
     }
 
     processWallWall(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
         // let A = [ax1, ay1, ax2, ay2]; // never changes and not needed
         let B = [bx1, by1, bx2, by2]; // could turn into 0, 1 or 2 pieces
         let C = null;
-        if (((ax1 <= bx2 && ax1 >= bx1) || (ax2 <= bx2 && ax2 >= bx1)) &&
-        ((ay2 <= by2 && ay2 >= by1) || (ay1 <= by2 && ay1 >= by1))) { // segments intersect
-            B = null;
-            // const isVertical1 = ay2 - ay1 > ax2 - ax1;
-            const isVertical2 = by2 - by1 > bx2 - bx1;
+        if (((ax1 <= bx2 && ax1 >= bx1) || (ax2 <= bx2 && ax2 >= bx1) || (bx1 <= ax2 && bx1 >= ax1) || (bx2 <= ax2 && bx2 >= ax1)) &&
+        ((ay2 <= by2 && ay2 >= by1) || (ay1 <= by2 && ay1 >= by1) || (by2 <= ay2 && by2 >= ay1) || (by1 <= ay2 && by1 >= ay1))) { // segments intersect
 
+        // const isVertical1 = ay2 - ay1 > ax2 - ax1;
+            const isVertical2 = Math.abs(by2 - by1) > Math.abs(bx2 - bx1);
+            B = null;
             if (!isVertical2) { // horizontal b breaks
-                if (bx1 < ax1) B = [bx1, by1, ax1 - 1, by1];
-                if (bx2 > ax2) C = [ax2 + 1, by2, bx2, by2];
-            } else { // vertical b breaks
-                if (by1 < ay1) B = [bx1, by1, bx1, ay1 - 1];
-                if (by2 > ay2) C = [bx2, ay2 + 1, bx2, by2];
+
+                if (bx1 < ax1) {
+                    B = [bx1, by1, ax1 - 1, by1];
+                    if (ax1 - 1 < bx1) console.error('rly');
+                }
+                if (bx2 > ax2) {
+                    C = [ax2 + 1, by2, bx2, by2];
+                    if (ax1 + 1 > bx2) console.error('rly');
+                }
             }
+            if (isVertical2) { // vertical b breaks
+                B = null;
+                if (by1 < ay1) {
+                    B = [bx1, by1, bx1, ay1 - 1];
+                    if (ay1 - 1 < by1) console.error('rly');
+                }
+                if (by2 > ay2) {
+                    C = [bx2, ay2 + 1, bx2, by2];
+                    if (ay2 + 1 > by2) console.error('rly');
+                }
+            }
+            // if (B && C) debugger;
         }
-        return {B, C}; // i hope no one will ever see it. I just want to look at result.
+
+        return {B, C}; // hope no one will ever see it. I just want to look at result.
     }
 }
 

@@ -2,7 +2,7 @@ import floorsVert from './shaders/floors.vert';
 import floorsFrag from './shaders/floors.frag';
 
 const tunnelHeight = 1.7;
-const tunnelWidth = 1.2;
+const tunnelWidth = 1;
 
 class Tunnels {
     constructor(tunnels, colorFlag) {
