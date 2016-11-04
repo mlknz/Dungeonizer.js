@@ -13,7 +13,7 @@ class App {
             return;
         }
 
-        const renderer = new THREE.WebGLRenderer({antialias: true});
+        const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
 
         if (renderer.extensions.get('ANGLE_instanced_arrays') === false) {
             document.body.innerHTML = 'Unable to get ANGLE_instanced_arrays WebGL extension. Your browser may not support it.';
@@ -24,6 +24,7 @@ class App {
         canvas.className = 'canvas';
         const root = document.getElementById('root');
         root.appendChild(canvas);
+        root.style.backgroundColor = 'red';
 
         const dungeonVisualizer = window.dungeonizer.initVisualizer(renderer);
 

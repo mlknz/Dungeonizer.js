@@ -1,5 +1,5 @@
-import floorsVert from './shaders/floors.vert';
-import floorsFrag from './shaders/floors.frag';
+import floorsVert from './shaders/tmp.vert';
+import floorsFrag from './shaders/tmp.frag';
 
 const tunnelHeight = 1.7;
 const tunnelWidth = 1;

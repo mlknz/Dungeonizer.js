@@ -50,7 +50,8 @@ const createDungeonMesh = function(dungeon, dungeonId) {
 window.dungeonizer = window.dungeonizer || {};
 window.dungeonizer.initVisualizer = function(renderer) {
 
-    renderer.setClearColor(0x334422, 1.0);
+    renderer.setClearColor(0x111111, false);
+    renderer.setPixelRatio(window.devicePixelRatio || 1);
 
     const gl = renderer.getContext();
     let aspectRatio = gl.canvas.clientWidth / gl.canvas.clientHeight;
