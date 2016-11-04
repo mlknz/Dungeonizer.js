@@ -19,6 +19,7 @@ class Tunnels {
         }
     }
 
+    // todo: provide x1 <= x2 and y1 <= y2 for tunnels on generation for the sake of futher code  simplification
     generateTunnel(roomA, roomB) {
         let tunnel = [];
 
@@ -35,12 +36,12 @@ class Tunnels {
         if (overlapX > 0) {
 
             const x = rightRoom.x1 + Math.floor((Math.random() * 0.6 + 0.3) * overlapX);
-            tunnel = [x, upRoom.y1, x, downRoom.y2];
+            tunnel = [x, downRoom.y2, x, upRoom.y1];
 
         } else if (overlapY > 0) {
 
             const y = upRoom.y1 + Math.floor((Math.random() * 0.6 + 0.3) * overlapY);
-            tunnel = [rightRoom.x1, y, leftRoom.x2, y];
+            tunnel = [leftRoom.x2, y, rightRoom.x1, y];
 
         } else {
 

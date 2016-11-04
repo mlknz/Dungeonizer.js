@@ -39,8 +39,8 @@ const generateDungeonImpl = function({
 
     const walls = new Walls(rooms.rooms, tunnels.tunnels);
     walls.removeWallWallIntersections();
-    walls.removeTunnelWallIntersections(tunnels.tunnels);
-    walls.removeRoomWallIntersections(rooms.rooms);
+    walls.removeTunnelWallIntersections();
+    walls.removeRoomWallIntersections();
 
     return {
         rooms: rooms.rooms,
