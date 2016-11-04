@@ -19,7 +19,6 @@ class Tunnels {
         }
     }
 
-    // todo: provide x1 <= x2 and y1 <= y2 for tunnels on generation for the sake of futher code  simplification
     generateTunnel(roomA, roomB) {
         let tunnel = [];
 
@@ -37,11 +36,13 @@ class Tunnels {
 
             const x = rightRoom.x1 + Math.floor((Math.random() * 0.6 + 0.3) * overlapX);
             tunnel = [x, downRoom.y2, x, upRoom.y1];
+            if (downRoom.y2 > upRoom.y1) console.log('hm');
 
         } else if (overlapY > 0) {
 
             const y = upRoom.y1 + Math.floor((Math.random() * 0.6 + 0.3) * overlapY);
             tunnel = [leftRoom.x2, y, rightRoom.x1, y];
+            if (leftRoom.x2 > rightRoom.x1) console.log('hm');
 
         } else {
 
@@ -53,65 +54,48 @@ class Tunnels {
             const yRange = Math.floor((0.15 + Math.random() * 0.5) * roomB.h);
             const y2 = dy < 0 ? roomB.y1 + yRange : roomB.y2 - yRange;
 
-            tunnel = [x1, y1, x1, y2, x1, y2, x2, y2];
+            tunnel = [
+                x1, Math.min(y1, y2), x1, Math.max(y1, y2),
+                Math.min(x1, x2), y2, Math.max(x1, x2), y2
+            ];
         }
         return tunnel;
     }
 
+    // under assumption x1 <= x2 and y1 <= y2 for tunnels
     cutTunnels(rooms, tunnels) {
         let room;
         let t;
         for (let i = 0; i < rooms.length; i++) {
             room = rooms[i];
             for (let j = 0; j < tunnels.length; j += 4) {
-                const dx = tunnels[j + 2] - tunnels[j];
-                const dy = tunnels[j + 3] - tunnels[j + 1];
-                const leftRight = dx < 0;
-                const rightLeft = dx > 0;
-                const downUp = dy < 0;
-                const upDown = dy > 0;
+                const isHorizontal = tunnels[j + 2] - tunnels[j] > 0;
 
                 if (room.isMain || room.isAttached) {
                     if (pointInsideRectangle(tunnels[j], tunnels[j + 1], room.x1, room.y1, room.x2, room.y2)) {
-                        if (leftRight) {
-                            tunnels[j] = room.x1;
-                        } else if (rightLeft) {
+                        if (isHorizontal) {
                             tunnels[j] = room.x2;
-                        } else if (downUp) {
-                            tunnels[j + 1] = room.y1;
                         } else {
                             tunnels[j + 1] = room.y2;
                         }
                     }
                     if (pointInsideRectangle(tunnels[j + 2], tunnels[j + 3], room.x1, room.y1, room.x2, room.y2)) {
-                        if (rightLeft) {
+                        if (isHorizontal) {
                             tunnels[j + 2] = room.x1;
-                        } else if (leftRight) {
-                            tunnels[j + 2] = room.x2;
-                        } else if (upDown) {
-                            tunnels[j + 3] = room.y1;
                         } else {
-                            tunnels[j + 3] = room.y2;
+                            tunnels[j + 3] = room.y1;
                         }
                     }
 
                     if (alignedSegmentRectangleCol(tunnels[j], tunnels[j + 1], tunnels[j + 2], tunnels[j + 3],
                     room.x1, room.y1, room.x2, room.y2)) {
-                        if (rightLeft) {
+                        if (isHorizontal) {
                             t = tunnels[j + 2];
                             tunnels[j + 2] = room.x1;
                             tunnels.push(room.x2, tunnels[j + 1], t, tunnels[j + 3]);
-                        } else if (leftRight) {
-                            t = tunnels[j];
-                            tunnels[j] = room.x1;
-                            tunnels.push(room.x2, tunnels[j + 1], t, tunnels[j + 3]);
-                        } else if (upDown) {
+                        } else {
                             t = tunnels[j + 3];
                             tunnels[j + 3] = room.y1;
-                            tunnels.push(tunnels[j], room.y2, tunnels[j + 2], t);
-                        } else {
-                            t = tunnels[j + 1];
-                            tunnels[j + 1] = room.y1;
                             tunnels.push(tunnels[j], room.y2, tunnels[j + 2], t);
                         }
                     }

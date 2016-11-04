@@ -28,23 +28,19 @@ class Walls {
         const roomPerimeter = [
             x1, y1, x1, y2,
             x1, y2, x2, y2,
-            x2, y2, x2, y1,
-            x2, y1, x1, y1
+            x2, y1, x2, y2,
+            x1, y1, x2, y1
         ];
         return roomPerimeter;
     }
 
+    // under assumption x1 <= x2 and y1 <= y2 for tunnels
     createTunnelWalls() {
         const tunnels = this.tunnels;
         let tunnelWalls = null;
 
         for (let i = 0; i < tunnels.length; i += 4) {
-            tunnelWalls = this.createTunnelWall(
-                Math.min(tunnels[i], tunnels[i + 2]),
-                Math.min(tunnels[i + 1], tunnels[i + 3]),
-                Math.max(tunnels[i], tunnels[i + 2]),
-                Math.max(tunnels[i + 1], tunnels[i + 3])
-            );
+            tunnelWalls = this.createTunnelWall(tunnels[i], tunnels[i + 1], tunnels[i + 2], tunnels[i + 3]);
             Array.prototype.push.apply(this.walls, tunnelWalls);
         }
     }
@@ -78,8 +74,8 @@ class Walls {
                 innerPerimeters.push(
                     x1, y1, x1, y2,
                     x1, y2, x2, y2,
-                    x2, y2, x2, y1,
-                    x2, y1, x1, y1
+                    x2, y1, x2, y2,
+                    x1, y1, x2, y1
                 );
             }
         }
@@ -90,6 +86,7 @@ class Walls {
         this.removeSegmentsIntersections(this.tunnels, false);
     }
 
+    // under assumption x1 <= x2 and y1 <= y2 for tunnels
     removeSegmentsIntersections(tunnels, isWalls) {
         const walls = this.walls;
         let startWallsLength = 0;
@@ -100,16 +97,10 @@ class Walls {
             for (let j = 0; j < walls.length; j += 4) {
                 for (let i = 0; i < (isWalls ? j : tunnels.length); i += 4) {
                     const pieces = this.resolveSegmentSegment(
-                        Math.min(tunnels[i], tunnels[i + 2]),
-                        Math.min(tunnels[i + 1], tunnels[i + 3]),
-                        Math.max(tunnels[i], tunnels[i + 2]),
-                        Math.max(tunnels[i + 1], tunnels[i + 3]),
-                        Math.min(walls[j], walls[j + 2]),
-                        Math.min(walls[j + 1], walls[j + 3]),
-                        Math.max(walls[j], walls[j + 2]),
-                        Math.max(walls[j + 1], walls[j + 3])
+                        tunnels[i], tunnels[i + 1], tunnels[i + 2], tunnels[i + 3],
+                        walls[j], walls[j + 1], walls[j + 2], walls[j + 3]
                     );
-                    if (pieces.length < 4) {
+                    if (pieces.length < 4) { // todo: perform wall removal
                         walls[j] = 10000 + i;
                         walls[j + 1] = 10000 + i;
                         walls[j + 2] = 10000 + i + 1;
@@ -136,11 +127,11 @@ class Walls {
     // first segment always remains unchanged, second could and will break into 0, 1 or 2 pieces
     resolveSegmentSegment(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
         const result = [];
+        // todo: replace with less ugly check for possible intersection :D
         if (((ax1 <= bx2 && ax1 >= bx1) || (ax2 <= bx2 && ax2 >= bx1) || (bx1 <= ax2 && bx1 >= ax1) || (bx2 <= ax2 && bx2 >= ax1)) &&
         ((ay2 <= by2 && ay2 >= by1) || (ay1 <= by2 && ay1 >= by1) || (by2 <= ay2 && by2 >= ay1) || (by1 <= ay2 && by1 >= ay1))) { // segments intersect
 
-            const isVerticalB = Math.abs(by2 - by1) > Math.abs(bx2 - bx1);
-            if (!isVerticalB) { // horizontal b breaks
+            if (by2 - by1 < bx2 - bx1) { // horizontal b breaks
                 if (bx1 < ax1) {
                     result.push(bx1, by1, ax1 - 1, by1);
                 }
