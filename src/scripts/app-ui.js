@@ -16,8 +16,8 @@ class AppUi {
         // roomsFolder.open();
         gui.add(this.dungeonParams, 'connectivity').min(0).max(1).step(0.01);
         gui.add(this.dungeonParams, 'density').min(0).max(1).step(0.01);
-        gui.add(this.dungeonParams, 'withWalls');
-        gui.add(this.dungeonParams, 'isDebug');
+        gui.add(config.generationMode, 'withWalls');
+        gui.add(config.generationMode, 'isDebug');
         gui.add(this.dungeonParams, 'fromDungeonId');
         gui.add(this.dungeonParams, 'dungeonId').onChange().listen();
 
@@ -48,8 +48,8 @@ class AppUi {
 
         const dungeon = window.dungeonizer.generateDungeonById(
             dungeonId,
-            this.dungeonParams.withWalls,
-            this.dungeonParams.isDebug
+            config.generationMode.withWalls,
+            config.generationMode.isDebug
         );
         this.dungeonVisualizer.makeDungeonVisual(dungeon, dungeonId);
     }

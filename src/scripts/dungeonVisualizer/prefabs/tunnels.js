@@ -1,29 +1,25 @@
-import floorsVert from './shaders/tmp.vert';
-import floorsFrag from './shaders/tmp.frag';
-
-const tunnelHeight = 1.7;
-const tunnelWidth = 1;
+import tunnelsVert from './shaders/tunnels.vert';
+import tunnelsFrag from './shaders/tunnels.frag';
 
 class Tunnels {
-    constructor(tunnels, colorFlag) {
+    // under assumption x1 <= x2 and y1 <= y2 for tunnels
+    constructor(tunnels, {isDebug, config}) {
         const offsets = [];
         const scales = [];
-        const metaInfo = [];
-        let x1, x2, y1, y2, isHorizontal;
-        for (let i = 0; i < tunnels.length; i += 4) {
-            x1 = tunnels[i];
-            y1 = tunnels[i + 1];
-            x2 = tunnels[i + 2];
-            y2 = tunnels[i + 3];
+        const tHeight = isDebug ? config.tunnelDebugHeight : config.tunnelHeight;
+        let isHorizontal, x, y, xS, yS;
 
-            offsets.push((x1 + x2) / 2, 0, (y1 + y2) / 2);
-            isHorizontal = Math.abs(x2 - x1) > Math.abs(y2 - y1);
-            scales.push(
-                isHorizontal ? Math.abs(x2 - x1) + tunnelWidth / 2 : tunnelWidth,
-                colorFlag ? 5 : tunnelHeight,
-                isHorizontal ? tunnelWidth : Math.abs(y2 - y1) + tunnelWidth / 2
-            );
-            metaInfo.push(-1);
+        for (let i = 0; i < tunnels.length; i += 4) {
+            isHorizontal = tunnels[i + 2] - tunnels[i] > tunnels[i + 3] - tunnels[i + 1];
+
+            x = isHorizontal ? (tunnels[i] + tunnels[i + 2]) / 2 : (tunnels[i] + 0.5);
+            xS = isHorizontal ? tunnels[i + 2] - tunnels[i] : 1;
+
+            y = isHorizontal ? (tunnels[i + 1] + 0.5) : (tunnels[i + 1] + tunnels[i + 3]) / 2;
+            yS = isHorizontal ? 1 : tunnels[i + 3] - tunnels[i + 1];
+
+            offsets.push(x, 0, y);
+            scales.push(xS, tHeight, yS);
         }
 
         const cubeGeom = new THREE.BoxBufferGeometry(1, 1, 1);
@@ -34,21 +30,18 @@ class Tunnels {
         geom.setIndex(cubeGeom.index);
         geom.addAttribute('offset', new THREE.InstancedBufferAttribute(new Float32Array(offsets), 3, 1));
         geom.addAttribute('scale', new THREE.InstancedBufferAttribute(new Float32Array(scales), 3, 1));
-        geom.addAttribute('metaInfo', new THREE.InstancedBufferAttribute(new Float32Array(metaInfo), 1, 1));
 
         const uniforms = THREE.UniformsUtils.clone(THREE.UniformsLib.lights);
-        uniforms.overwriteColor = {value: new THREE.Vector3(-10)};
+        uniforms.color = {value: new THREE.Color(isDebug ? config.tunnelDebugColor : config.tunnelColor)};
 
         const floorsMaterial = new THREE.RawShaderMaterial({
             uniforms,
-            vertexShader: floorsVert,
-            fragmentShader: floorsFrag,
-            side: THREE.DoubleSide,
+            vertexShader: tunnelsVert,
+            fragmentShader: tunnelsFrag,
+            side: THREE.FrontSide,
             transparent: false,
             lights: true
         });
-
-        if (colorFlag) floorsMaterial.uniforms.overwriteColor.value.x = 20;
 
         return new THREE.Mesh(geom, floorsMaterial);
     }

@@ -26,18 +26,18 @@ const createDungeonMesh = function(dungeon, dungeonId) {
     roomsMesh.frustumCulled = false;
     root.add(roomsMesh);
 
-    const tunnelsMesh = new Tunnels(dungeon.tunnels);
+    const tunnelsMesh = new Tunnels(dungeon.tunnels, {isDebug, config: config.visParams});
     tunnelsMesh.frustumCulled = false;
     root.add(tunnelsMesh);
 
     if (dungeon.walls) {
-        const wallsMesh = new Tunnels(dungeon.walls, true);
-        wallsMesh.frustumCulled = false;
-        root.add(wallsMesh);
+        // const wallsMesh = new Tunnels(dungeon.walls, true);
+        // wallsMesh.frustumCulled = false;
+        // root.add(wallsMesh);
     }
 
     if (isDebug) {
-        const triangulationLinesMesh = new Lines(dungeon.delaunayTriangles, 0xbbbbbb);
+        const triangulationLinesMesh = new Lines(dungeon.delaunayTriangles, 0x888888);
         root.add(triangulationLinesMesh);
 
         const mstLinesMesh = new Lines(dungeon.mstLines, 0x0000ff);
