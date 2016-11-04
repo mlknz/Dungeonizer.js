@@ -5,12 +5,12 @@ export function rectanglesTouched(a, b) {
 }
 
 export function alignedSegmentRectangleCol(sx1, sy1, sx2, sy2, x1, y1, x2, y2) {
-    if (sx1 > Math.min(x1, x2) && sx1 < Math.max(x1, x2)) {
+    if (sx1 >= Math.min(x1, x2) && sx1 < Math.max(x1, x2)) {
         if (
             (y1 > Math.min(sy1, sy2) && y1 < Math.max(sy1, sy2)) || ((y2 > Math.min(sy1, sy2) && y2 < Math.max(sy1, sy2)))) {
             return true;
         }
-    } else if (sy1 > Math.min(y1, y2) && sy1 < Math.max(y1, y2)) {
+    } else if (sy1 >= Math.min(y1, y2) && sy1 < Math.max(y1, y2)) {
         if ((x1 > Math.min(sx1, sx2) && x1 < Math.max(sx1, sx2)) || ((x2 > Math.min(sx1, sx2) && x2 < Math.max(sx1, sx2)))) {
             return true;
         }
