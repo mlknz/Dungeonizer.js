@@ -27,15 +27,22 @@ const createDungeonMesh = function(dungeon, dungeonId) {
     tunnelsMesh.frustumCulled = false;
     root.add(tunnelsMesh);
 
-    const wallsMesh = new Tunnels(dungeon.walls, true);
-    wallsMesh.frustumCulled = false;
-    root.add(wallsMesh);
+    if (dungeon.walls) {
+        const wallsMesh = new Tunnels(dungeon.walls, true);
+        wallsMesh.frustumCulled = false;
+        root.add(wallsMesh);
+    }
 
-    const mstLinesMesh = new Lines(dungeon.mstLines, 0x0000ff);
-    // root.add(mstLinesMesh);
+    if (dungeon.mstLines && dungeon.leftAliveLines && dungeon.delaunayTriangles) {
+        const triangulationLinesMesh = new Lines(dungeon.delaunayTriangles, 0x888888);
+        root.add(triangulationLinesMesh);
 
-    const leftAliveLinesMesh = new Lines(dungeon.leftAliveLines, 0x00ff00);
-    // root.add(leftAliveLinesMesh);
+        const mstLinesMesh = new Lines(dungeon.mstLines, 0x0000ff);
+        root.add(mstLinesMesh);
+
+        const leftAliveLinesMesh = new Lines(dungeon.leftAliveLines, 0xff0000);
+        root.add(leftAliveLinesMesh);
+    }
 
     return root;
 };

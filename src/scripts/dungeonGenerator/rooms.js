@@ -138,7 +138,7 @@ class Rooms {
           return mainVerts;
       }
 
-      attachIntersectedByTunnels(tunnels) {
+      attachIntersectedByTunnels(tunnels, isDebug) {
           let room;
           for (let i = this.rooms.length - 1; i >= 0; i--) {
               room = this.rooms[i];
@@ -147,6 +147,9 @@ class Rooms {
                           tunnels[j], tunnels[j + 1], tunnels[j + 2], tunnels[j + 3],
                           room.x1, room.y1, room.x2, room.y2
                       )) {
+                      if (isDebug) {
+                          room.isAttached = true;
+                      }
                       this.dungeonRooms.push(room);
                       this.rooms.splice(i, 1);
                   }

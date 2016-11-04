@@ -8,7 +8,9 @@ const config = {
         connectivity: 0.55,
         density: 0.3,
         fromDungeonId: false,
-        dungeonId: ''
+        dungeonId: '',
+        withWalls: true,
+        isDebug: false
     }
 };
 

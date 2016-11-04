@@ -18,7 +18,7 @@ const generateDungeonImpl = function({
     roomSizeDeviation,
     mainRoomThreshold,
     connectivity,
-    density}) {
+    density}, withWalls, isDebug) {
 
     seedRandom(seed, { global: true }); // replaces Math.random with seeded random
 
@@ -34,23 +34,36 @@ const generateDungeonImpl = function({
     const minSpanningTree = generateMST(triangulation.edges, triangulation.gVerts, leaveExtraEdgeOneFrom);
 
     const tunnels = new Tunnels(rooms.dungeonRooms, minSpanningTree.edges, minSpanningTree.leftAlive, mainRoomsCenters);
-    rooms.attachIntersectedByTunnels(tunnels.tunnels);
+    rooms.attachIntersectedByTunnels(tunnels.tunnels, isDebug);
     tunnels.cutTunnels(rooms.dungeonRooms, tunnels.tunnels);
 
-    const walls = new Walls(rooms.dungeonRooms, tunnels.tunnels);
-    walls.removeWallWallIntersections();
-    walls.removeTunnelWallIntersections();
-    walls.removeRoomWallIntersections();
-
-    return {
+    const dungeon = {
         rooms: rooms.dungeonRooms,
-        tunnels: tunnels.tunnels,
-        walls: walls.walls,
-        trashRooms: rooms.rooms,
-        delaunayTriangles: triangulation.triangulationLines,
-        mstLines: tunnels.mstLines,
-        leftAliveLines: tunnels.leftAliveLines
+        tunnels: tunnels.tunnels
     };
+
+    if (withWalls) {
+        const walls = new Walls(rooms.dungeonRooms, tunnels.tunnels);
+        walls.removeWallWallIntersections();
+        walls.removeTunnelWallIntersections();
+        walls.removeRoomWallIntersections();
+
+        dungeon.walls = walls.walls;
+    }
+
+    if (isDebug) {
+        dungeon.trashRooms = rooms.rooms;
+        dungeon.delaunayTriangles = triangulation.triangulationLines;
+        dungeon.mstLines = tunnels.mstLines;
+        dungeon.leftAliveLines = tunnels.leftAliveLines;
+    } else {
+        rooms.rooms.length = 0;
+        triangulation.triangulationLines.length = 0;
+        tunnels.mstLines.length = 0;
+        tunnels.leftAliveLines.length = 0;
+    }
+
+    return dungeon;
 };
 
 const mergeParamsWithDefaults = function(params) {
@@ -59,10 +72,12 @@ const mergeParamsWithDefaults = function(params) {
     corrected.connectivity = isNaN(params.connectivity) ? config.dungeonParams.connectivity : params.connectivity;
     corrected.density = isNaN(params.density) ? config.dungeonParams.density : params.density;
     corrected.dungeonSize = isNaN(params.dungeonSize) ? config.dungeonParams.dungeonSize : params.dungeonSize;
+
     corrected.mainRoomThreshold = isNaN(params.mainRoomThreshold) ? config.dungeonParams.mainRoomThreshold : params.mainRoomThreshold;
     corrected.roomSizeDeviation = isNaN(params.roomSizeDeviation) ? config.dungeonParams.roomSizeDeviation : params.roomSizeDeviation;
     corrected.roomSizeDistribution = isNaN(params.roomSizeDistribution) ? config.dungeonParams.roomSizeDistribution : params.roomSizeDistribution;
     corrected.roomSizeMean = isNaN(params.roomSizeMean) ? config.dungeonParams.roomSizeMean : params.roomSizeMean;
+
     corrected.seed = params.seed || (Math.random() + 1).toString(36).substring(7, 16);
 
     return corrected;
@@ -70,13 +85,14 @@ const mergeParamsWithDefaults = function(params) {
 
 window.dungeonizer = window.dungeonizer || {};
 
-window.dungeonizer.generateDungeon = function(params) {
+window.dungeonizer.generateDungeon = function(params, withWalls, isDebug) {
+    console.log(params);
     const correctedParams = mergeParamsWithDefaults(params);
     console.log('Dungeon params:', correctedParams);
-    return generateDungeonImpl(correctedParams);
+    return generateDungeonImpl(correctedParams, withWalls, isDebug);
 };
 
-window.dungeonizer.generateDungeonById = function(dungeonId) {
+window.dungeonizer.generateDungeonById = function(dungeonId, withWalls, isDebug) {
     console.log('DungeonId:', dungeonId);
     const params = dungeonId.split(',');
     return window.dungeonizer.generateDungeon({
@@ -88,5 +104,5 @@ window.dungeonizer.generateDungeonById = function(dungeonId) {
         mainRoomThreshold: parseFloat(params[5]),
         connectivity: parseFloat(params[6]),
         density: parseFloat(params[7])
-    });
+    }, withWalls, isDebug);
 };

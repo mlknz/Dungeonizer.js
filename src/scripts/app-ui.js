@@ -16,6 +16,8 @@ class AppUi {
         // roomsFolder.open();
         gui.add(this.dungeonParams, 'connectivity').min(0).max(1).step(0.01);
         gui.add(this.dungeonParams, 'density').min(0).max(1).step(0.01);
+        gui.add(this.dungeonParams, 'withWalls');
+        gui.add(this.dungeonParams, 'isDebug');
         gui.add(this.dungeonParams, 'fromDungeonId');
         gui.add(this.dungeonParams, 'dungeonId').onChange().listen();
 
@@ -44,7 +46,11 @@ class AppUi {
         const dungeonId = this.dungeonParams.fromDungeonId ? this.dungeonParams.dungeonId : this.generateNewDungeonId();
         this.dungeonParams.dungeonId = dungeonId;
 
-        const dungeon = window.dungeonizer.generateDungeonById(dungeonId);
+        const dungeon = window.dungeonizer.generateDungeonById(
+            dungeonId,
+            this.dungeonParams.withWalls,
+            this.dungeonParams.isDebug
+        );
         this.dungeonVisualizer.makeDungeonVisual(dungeon, dungeonId);
     }
 }
