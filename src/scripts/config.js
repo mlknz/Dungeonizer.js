@@ -11,6 +11,13 @@ const config = {
         dungeonId: '',
         withWalls: true,
         isDebug: false
+    },
+    visParams: {
+        floorHeight: 1,
+        mainFloorColor: [0.6, 0, 0],
+        attachedFloorColor: [0.2, 0.5, 0.1],
+        trashFloorColor: [0.3, 0.3, 0.3],
+        trashFloorY: -0.9
     }
 };
 

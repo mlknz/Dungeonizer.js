@@ -1,4 +1,4 @@
-import config from './dungeonGenerator/config.js';
+import config from './config.js';
 
 class AppUi {
     constructor(dungeonVisualizer) {

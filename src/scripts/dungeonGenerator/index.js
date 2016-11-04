@@ -1,7 +1,7 @@
 if (module.hot) {
     module.hot.accept();
 }
-import config from './config.js';
+import config from '../config.js';
 import Rooms from './rooms.js';
 import Tunnels from './tunnels.js';
 import Walls from './walls.js';

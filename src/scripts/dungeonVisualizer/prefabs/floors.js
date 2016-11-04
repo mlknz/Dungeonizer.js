@@ -1,18 +1,22 @@
 import floorsVert from './shaders/floors.vert';
 import floorsFrag from './shaders/floors.frag';
 
-const floorHeight = 1;
-
 class Floors {
-    constructor(floors) {
+    constructor(floors, {isTrashFloors, config}) {
         const offsets = [];
         const scales = [];
-        const metaInfo = [];
+        const colors = [];
+
+        const mainFloorColor = config.mainFloorColor;
+        const attachedFloorColor = config.attachedFloorColor;
+        const trashFloorColor = config.trashFloorColor;
+        const floorY = isTrashFloors ? config.trashFloorY : 0;
 
         for (let i = 0; i < floors.length; i++) {
-            offsets.push((floors[i].x1 + floors[i].x2) / 2, 0/* i*1.5*/, (floors[i].y1 + floors[i].y2) / 2);
-            scales.push(floors[i].x2 - floors[i].x1, floorHeight, floors[i].y2 - floors[i].y1);
-            metaInfo.push(floors[i].isAttached ? 2 : 1);
+            offsets.push(floors[i].x, floorY, floors[i].y);
+            scales.push(floors[i].w, config.floorHeight, floors[i].h);
+            colors.push.apply(colors, isTrashFloors ? trashFloorColor :
+                floors[i].isAttached ? attachedFloorColor : mainFloorColor);
         }
 
         const cubeGeom = new THREE.BoxBufferGeometry(1, 1, 1);
@@ -23,20 +27,23 @@ class Floors {
         geom.setIndex(cubeGeom.index);
         geom.addAttribute('offset', new THREE.InstancedBufferAttribute(new Float32Array(offsets), 3, 1));
         geom.addAttribute('scale', new THREE.InstancedBufferAttribute(new Float32Array(scales), 3, 1));
-        geom.addAttribute('metaInfo', new THREE.InstancedBufferAttribute(new Float32Array(metaInfo), 1, 1));
+        geom.addAttribute('color', new THREE.InstancedBufferAttribute(new Float32Array(colors), 3, 1));
 
         const uniforms = THREE.UniformsUtils.clone(THREE.UniformsLib.lights);
-        uniforms.overwriteColor = {value: new THREE.Vector3(-10)};
+        uniforms.opacity = {value: isTrashFloors ? 0.5 : 1};
+
         const floorsMaterial = new THREE.RawShaderMaterial({
             uniforms,
             vertexShader: floorsVert,
             fragmentShader: floorsFrag,
-            side: THREE.DoubleSide,
-            transparent: false,
+            side: THREE.FrontSide,
+            transparent: isTrashFloors ? true : false,
             lights: true
         });
 
-        return new THREE.Mesh(geom, floorsMaterial);
+        const floorsMesh = new THREE.Mesh(geom, floorsMaterial);
+
+        return floorsMesh;
     }
 }
 

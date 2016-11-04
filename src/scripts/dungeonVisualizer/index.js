@@ -8,6 +8,7 @@ import Floors from './prefabs/floors.js';
 import Tunnels from './prefabs/tunnels.js';
 import Lines from './prefabs/lines.js';
 
+import config from '../config.js';
 
 const clearScene = function(scene) {
     scene.children.forEach(obj => {
@@ -19,7 +20,9 @@ const createDungeonMesh = function(dungeon, dungeonId) {
     const root = new THREE.Object3D();
     root.name = 'Dungeon_' + dungeonId;
 
-    const roomsMesh = new Floors(dungeon.rooms);
+    const isDebug = dungeon.mstLines && dungeon.leftAliveLines && dungeon.delaunayTriangles && dungeon.trashRooms;
+
+    const roomsMesh = new Floors(dungeon.rooms, {isTrashFloors: false, config: config.visParams});
     roomsMesh.frustumCulled = false;
     root.add(roomsMesh);
 
@@ -33,8 +36,8 @@ const createDungeonMesh = function(dungeon, dungeonId) {
         root.add(wallsMesh);
     }
 
-    if (dungeon.mstLines && dungeon.leftAliveLines && dungeon.delaunayTriangles) {
-        const triangulationLinesMesh = new Lines(dungeon.delaunayTriangles, 0x888888);
+    if (isDebug) {
+        const triangulationLinesMesh = new Lines(dungeon.delaunayTriangles, 0xbbbbbb);
         root.add(triangulationLinesMesh);
 
         const mstLinesMesh = new Lines(dungeon.mstLines, 0x0000ff);
@@ -42,6 +45,10 @@ const createDungeonMesh = function(dungeon, dungeonId) {
 
         const leftAliveLinesMesh = new Lines(dungeon.leftAliveLines, 0xff0000);
         root.add(leftAliveLinesMesh);
+
+        const trashRoomsMesh = new Floors(dungeon.trashRooms, {isTrashFloors: true, config: config.visParams});
+        trashRoomsMesh.frustumCulled = false;
+        root.add(trashRoomsMesh);
     }
 
     return root;

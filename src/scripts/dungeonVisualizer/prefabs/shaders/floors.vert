@@ -3,14 +3,13 @@ attribute vec3 normal;
 
 attribute vec3 offset;
 attribute vec3 scale;
-attribute float metaInfo;
+attribute vec3 color;
 
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
 varying vec3 vNormal;
-varying float vIsMain;
-varying vec3 nothing;
+varying vec3 vColor;
 
 void main() {
     mat4 modelMat = mat4(
@@ -22,6 +21,5 @@ void main() {
 	gl_Position = projectionMatrix * viewMatrix * modelMat * vec4(position, 1.);
 
 	vNormal = mat3(viewMatrix * modelMat) * normal;
-	vIsMain = metaInfo;
-    nothing = offset;
+	vColor = color;
 }
