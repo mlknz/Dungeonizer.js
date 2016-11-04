@@ -25,7 +25,7 @@ const generateDungeonImpl = function({
     const rooms = new Rooms(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation, mainRoomThreshold, density);
     rooms.generateRoomSizes();
     rooms.placeRooms();
-    const mainRoomsCenters = rooms.chooseMainRooms(rooms.rooms);
+    const mainRoomsCenters = rooms.chooseMainRooms();
 
     const delTriangles = Delaunay.triangulate(mainRoomsCenters);
     const triangulation = processTriangulation(mainRoomsCenters, delTriangles);
@@ -33,22 +33,23 @@ const generateDungeonImpl = function({
     const leaveExtraEdgeOneFrom = Math.pow(100, 1 - Math.max(Math.min(connectivity, 1), 0));
     const minSpanningTree = generateMST(triangulation.edges, triangulation.gVerts, leaveExtraEdgeOneFrom);
 
-    const tunnels = new Tunnels(rooms.rooms, minSpanningTree.edges, minSpanningTree.leftAlive, mainRoomsCenters);
-    rooms.attachIntersectedRooms(rooms.rooms, tunnels.tunnels);
-    tunnels.cutTunnels(rooms.rooms, tunnels.tunnels);
+    const tunnels = new Tunnels(rooms.dungeonRooms, minSpanningTree.edges, minSpanningTree.leftAlive, mainRoomsCenters);
+    rooms.attachIntersectedByTunnels(tunnels.tunnels);
+    tunnels.cutTunnels(rooms.dungeonRooms, tunnels.tunnels);
 
-    const walls = new Walls(rooms.rooms, tunnels.tunnels);
+    const walls = new Walls(rooms.dungeonRooms, tunnels.tunnels);
     walls.removeWallWallIntersections();
     walls.removeTunnelWallIntersections();
     walls.removeRoomWallIntersections();
 
     return {
-        rooms: rooms.rooms,
+        rooms: rooms.dungeonRooms,
+        tunnels: tunnels.tunnels,
+        walls: walls.walls,
+        trashRooms: rooms.rooms,
         delaunayTriangles: triangulation.triangulationLines,
         mstLines: tunnels.mstLines,
-        leftAliveLines: tunnels.leftAliveLines,
-        tunnels: tunnels.tunnels,
-        walls: walls.walls
+        leftAliveLines: tunnels.leftAliveLines
     };
 };
 

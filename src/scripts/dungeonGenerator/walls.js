@@ -1,7 +1,7 @@
 class Walls {
-    constructor(rooms, tunnels) {
+    constructor(dungeonRooms, tunnels) {
         this.walls = [];
-        this.rooms = rooms;
+        this.dungeonRooms = dungeonRooms;
         this.tunnels = tunnels;
 
         this.createRoomWalls();
@@ -9,13 +9,11 @@ class Walls {
     }
 
     createRoomWalls() {
-        const rooms = this.rooms;
+        const rooms = this.dungeonRooms;
         let roomPerimeter = null;
         for (let i = 0; i < rooms.length; i++) {
-            if (rooms[i].isMain || rooms[i].isAttached) {
-                roomPerimeter = this.createRoomPerimeterWall(rooms[i]);
-                Array.prototype.push.apply(this.walls, roomPerimeter);
-            }
+            roomPerimeter = this.createRoomPerimeterWall(rooms[i]);
+            Array.prototype.push.apply(this.walls, roomPerimeter);
         }
     }
 
@@ -63,21 +61,19 @@ class Walls {
     }
 
     removeRoomWallIntersections() {
-        const rooms = this.rooms;
+        const rooms = this.dungeonRooms;
         const innerPerimeters = [];
         for (let i = 0; i < rooms.length; i++) {
-            if (rooms[i].isMain || rooms[i].isAttached) {
-                const x1 = rooms[i].x - rooms[i].w / 2 + 1;
-                const x2 = rooms[i].x + rooms[i].w / 2 - 1;
-                const y1 = rooms[i].y - rooms[i].h / 2 + 1;
-                const y2 = rooms[i].y + rooms[i].h / 2 - 1;
-                innerPerimeters.push(
-                    x1, y1, x1, y2,
-                    x1, y2, x2, y2,
-                    x2, y1, x2, y2,
-                    x1, y1, x2, y1
-                );
-            }
+            const x1 = rooms[i].x - rooms[i].w / 2 + 1;
+            const x2 = rooms[i].x + rooms[i].w / 2 - 1;
+            const y1 = rooms[i].y - rooms[i].h / 2 + 1;
+            const y2 = rooms[i].y + rooms[i].h / 2 - 1;
+            innerPerimeters.push(
+                x1, y1, x1, y2,
+                x1, y2, x2, y2,
+                x2, y1, x2, y2,
+                x1, y1, x2, y1
+            );
         }
         this.removeSegmentsIntersections(innerPerimeters, false);
     }

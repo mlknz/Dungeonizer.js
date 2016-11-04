@@ -2,6 +2,9 @@ import {rectanglesTouched, getBoxMullerGaussianNoise, alignedSegmentRectangleCol
 
 class Rooms {
       constructor(dungeonSize, roomSizeDistribution, roomSizeMean, roomSizeDeviation, mainRoomThreshold, density) {
+          this.rooms = [];
+          this.dungeonRooms = [];
+
           this.roomSizeDistribution = roomSizeDistribution;
           this.roomSizeMean = roomSizeMean;
           this.roomSizeDeviation = roomSizeDeviation;
@@ -11,7 +14,6 @@ class Rooms {
 
           this.minRoomSize = roomSizeMean * (1 - roomSizeDeviation);
           this.maxRoomSize = roomSizeMean * (1 + roomSizeDeviation);
-          this.rooms = [];
           this.roomsAmount = dungeonSize * 5 + Math.floor(Math.random() * dungeonSize);
       }
 
@@ -31,7 +33,7 @@ class Rooms {
               w = Math.round(this.getDistributionPoint());
               h = Math.round(this.getDistributionPoint());
               size = w * h;
-              this.rooms.push({x: w / 2, y: h / 2, w, h, size, x1: 0, x2: w, y1: 0, y2: h, isMain: false});
+              this.rooms.push({x: w / 2, y: h / 2, w, h, size, x1: 0, x2: w, y1: 0, y2: h});
           }
       }
 
@@ -119,32 +121,34 @@ class Rooms {
           }
       }
 
-      chooseMainRooms(rooms) {
+      chooseMainRooms() {
+          const rooms = this.rooms;
+          const dungeonRooms = this.dungeonRooms;
           const mainVerts = [];
           const threshold = this.roomSizeMean * this.mainRoomThreshold;
 
-          let mainRoomsAmount = 0;
           for (let i = rooms.length - 1; i >= 0; i--) {
               if (rooms[i].w > threshold && rooms[i].h > threshold) {
-                  rooms[i].isMain = true;
-                  mainVerts.push([rooms[i].x, rooms[i].y, i]);
-                  mainRoomsAmount++;
+                  mainVerts.push([rooms[i].x, rooms[i].y, dungeonRooms.length]);
+                  dungeonRooms.push(rooms[i]);
+                  rooms.splice(i, 1);
               }
           }
 
           return mainVerts;
       }
 
-      attachIntersectedRooms(rooms, tunnels) {
+      attachIntersectedByTunnels(tunnels) {
           let room;
-          for (let i = 0; i < rooms.length; i++) {
-              room = rooms[i];
+          for (let i = this.rooms.length - 1; i >= 0; i--) {
+              room = this.rooms[i];
               for (let j = 0; j < tunnels.length; j = j + 4) {
-                  if (!room.isMain) {
-                      if (alignedSegmentRectangleCol(tunnels[j], tunnels[j + 1], tunnels[j + 2], tunnels[j + 3],
-                      room.x1, room.y1, room.x2, room.y2)) {
-                          room.isAttached = true;
-                      }
+                  if (alignedSegmentRectangleCol(
+                          tunnels[j], tunnels[j + 1], tunnels[j + 2], tunnels[j + 3],
+                          room.x1, room.y1, room.x2, room.y2
+                      )) {
+                      this.dungeonRooms.push(room);
+                      this.rooms.splice(i, 1);
                   }
               }
           }
