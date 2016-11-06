@@ -117,6 +117,13 @@ class Walls {
 
         return result;
     }
+
+    removeZeroLengthWalls() {
+        const walls = this.walls;
+        for (let i = walls.length - 4; i >= 0; i -= 4) {
+            if (walls[i + 2] - walls[i] < 0.5 && walls[i + 3] - walls[i + 1] < 0.5) walls.splice(i, 4);
+        }
+    }
 }
 
 export default Walls;

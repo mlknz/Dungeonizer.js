@@ -26,17 +26,14 @@ class Tunnels {
             y = isHorizontal ? (tunnels[i + 1] + 0.5) : (tunnels[i + 1] + tunnels[i + 3]) / 2;
             yS = isHorizontal ? 1 : tunnels[i + 3] - tunnels[i + 1];
 
-            // todo: handle empty pieces in generator
-            if (tunnels[i + 2] - tunnels[i] > 0.5 || tunnels[i + 3] - tunnels[i + 1] > 0.5) {
-                offsets.push(x, hOffset, y);
-                scales.push(xS, h, yS);
-                const debugWallColor = [
-                    Math.abs(Math.sin(157.21355 * x)),
-                    Math.abs(Math.sin(157.21355 * x * y)) / 3,
-                    Math.abs(Math.sin(157.21355 * y))
-                ];
-                colors.push.apply(colors, (isWall && isDebug) ? debugWallColor : c);
-            }
+            offsets.push(x, hOffset, y);
+            scales.push(xS, h, yS);
+            const debugWallColor = [
+                Math.abs(Math.sin(157.21355 * x)),
+                Math.abs(Math.sin(157.21355 * x * y)) / 3,
+                Math.abs(Math.sin(157.21355 * y))
+            ];
+            colors.push.apply(colors, (isWall && isDebug) ? debugWallColor : c);
         }
 
         const cubeGeom = new THREE.BoxBufferGeometry(1, 1, 1);

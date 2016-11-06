@@ -49,6 +49,7 @@ const generateDungeonImpl = function({
         resolveAlignedRectanglesSegmentsIntersections(rooms.dungeonRooms, walls.walls);
         walls.removeTunnelWallIntersections(tunnels.tunnels);
         walls.removeWallWallIntersections();
+        walls.removeZeroLengthWalls();
 
         dungeon.walls = walls.walls;
     }
