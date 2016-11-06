@@ -3,6 +3,7 @@ import config from './config.js';
 class AppUi {
     constructor(dungeonVisualizer) {
         this.dungeonVisualizer = dungeonVisualizer;
+        this.dungeon = null;
 
         this.dungeonParams = config.dungeonParams;
 
@@ -20,6 +21,11 @@ class AppUi {
         gui.add(config.generationMode, 'isDebug');
         gui.add(this.dungeonParams, 'fromDungeonId');
         gui.add(this.dungeonParams, 'dungeonId').onChange().listen();
+
+        const exportButton = { ExportToFile: () => {
+            this.exportDungeon(this.dungeon, this.dungeonParams.dungeonId);
+        } };
+        gui.add(exportButton, 'ExportToFile');
 
         const generateButton = { Generate: () => {
             this.resetDungeon();
@@ -51,7 +57,27 @@ class AppUi {
             config.generationMode.withWalls,
             config.generationMode.isDebug
         );
+        this.dungeon = dungeon;
+
         this.dungeonVisualizer.makeDungeonVisual(dungeon, dungeonId);
+    }
+
+    exportDungeon(dungeon, dungeonId) {
+        const dataToWrite = JSON.stringify({
+            dungeonId,
+            dungeon
+        }, null, 4);
+
+        window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+        window.requestFileSystem(window.TEMPORARY, 1024 * 1024, (fs) => {
+            fs.root.getFile('dungeon_' + dungeonId + '.bin', {create: true}, (fileEntry) => {
+                fileEntry.createWriter((fileWriter) => {
+                    const blob = new Blob([dataToWrite]);
+                    fileWriter.addEventListener('writeend', () => { location.href = fileEntry.toURL(); }, false);
+                    fileWriter.write(blob);
+                }, () => {});
+            }, () => {});
+        }, () => {});
     }
 }
 
