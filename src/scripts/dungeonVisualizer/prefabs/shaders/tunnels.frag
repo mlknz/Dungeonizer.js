@@ -4,12 +4,12 @@ varying vec3 vNormal;
 #include <common>
 #include <lights_pars>
 
-uniform vec3 color;
-varying vec3 nothing;
+varying vec3 vColor;
+varying vec2 vUv;
 
 void main() {
 
-	vec3 c = color.b > 0.4 ? vec3(abs(sin(157.21355 * nothing.x)), abs(sin(157.21355 * nothing.x * nothing.z)) / 2., abs(sin(157.21355 * nothing.z))) : color;
+	vec3 c = vColor * sqrt(vUv.y);
 
     #if NUM_DIR_LIGHTS > 0
     vec3 light;
