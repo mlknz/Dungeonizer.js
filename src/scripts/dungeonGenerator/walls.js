@@ -3,7 +3,7 @@ class Walls {
         this.walls = [];
         this.dungeonRooms = dungeonRooms;
 
-        // this.createRoomWalls();
+        this.createRoomWalls();
         Array.prototype.push.apply(this.walls, walls);
     }
 
@@ -33,24 +33,6 @@ class Walls {
 
     removeWallWallIntersections() {
         this.removeSegmentsIntersections(this.walls, true);
-    }
-
-    removeRoomWallIntersections() {
-        const rooms = this.dungeonRooms;
-        const innerPerimeters = [];
-        for (let i = 0; i < rooms.length; i++) {
-            const x1 = rooms[i].x - rooms[i].w / 2 + 1;
-            const x2 = rooms[i].x + rooms[i].w / 2 - 1;
-            const y1 = rooms[i].y - rooms[i].h / 2 + 1;
-            const y2 = rooms[i].y + rooms[i].h / 2 - 1;
-            innerPerimeters.push(
-                x1, y1, x1, y2,
-                x1, y2, x2, y2,
-                x2, y1, x2, y2,
-                x1, y1, x2, y1
-            );
-        }
-        this.removeSegmentsIntersections(innerPerimeters, false);
     }
 
     removeTunnelWallIntersections() {

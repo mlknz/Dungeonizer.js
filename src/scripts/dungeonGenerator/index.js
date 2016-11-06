@@ -6,7 +6,7 @@ import Rooms from './rooms.js';
 import Tunnels from './tunnels.js';
 import Walls from './walls.js';
 import {processTriangulation, generateMST} from './math/graphUtils.js';
-
+import {resolveAlignedRectanglesSegmentsIntersections} from './math/mathUtils.js';
 const Delaunay = require('./math/delaunay.js');
 const seedRandom = require('seedrandom');
 
@@ -35,7 +35,9 @@ const generateDungeonImpl = function({
 
     const tunnels = new Tunnels(rooms.dungeonRooms, minSpanningTree.edges, minSpanningTree.leftAlive, mainRoomsCenters, withWalls);
     rooms.attachIntersectedByTunnels(tunnels.tunnels, isDebug);
-    tunnels.cutTunnels(rooms.dungeonRooms);
+
+    // not cutting walls in this pass because of L-shape walls case complexity
+    resolveAlignedRectanglesSegmentsIntersections(rooms.dungeonRooms, tunnels.tunnels);
 
     const dungeon = {
         rooms: rooms.dungeonRooms,
@@ -44,9 +46,8 @@ const generateDungeonImpl = function({
 
     if (withWalls) {
         const walls = new Walls(rooms.dungeonRooms, tunnels.walls1.concat(tunnels.walls2));
-
+        resolveAlignedRectanglesSegmentsIntersections(rooms.dungeonRooms, walls.walls);
         // walls.removeTunnelWallIntersections();
-        // walls.removeRoomWallIntersections();
         // walls.removeWallWallIntersections();
 
         dungeon.walls = walls.walls;

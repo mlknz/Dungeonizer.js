@@ -26,6 +26,48 @@ export function dSq(a, b) {
     return (a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]);
 }
 
+// under assumption x1 <= x2 and y1 <= y2 for tunnels
+export function resolveAlignedRectanglesSegmentsIntersections(dungeonRooms, tunnels) {
+    let room;
+    let t = null;
+    let len = tunnels.length;
+
+    for (let j = 0; j < len; j += 4) {
+        for (let i = 0; i < dungeonRooms.length; i++) {
+            room = dungeonRooms[i];
+
+            const isHorizontal = tunnels[j + 2] - tunnels[j] > 0;
+
+            if (pointInsideRectangle(tunnels[j], tunnels[j + 1], room.x1, room.y1, room.x2, room.y2)) {
+                if (isHorizontal) {
+                    tunnels[j] = room.x2;
+                } else {
+                    tunnels[j + 1] = room.y2;
+                }
+            } else if (pointInsideRectangle(tunnels[j + 2], tunnels[j + 3], room.x1, room.y1, room.x2, room.y2)) {
+                if (isHorizontal) {
+                    tunnels[j + 2] = room.x1;
+                } else {
+                    tunnels[j + 3] = room.y1;
+                }
+            } else if (alignedSegmentRectangleCol(tunnels[j], tunnels[j + 1], tunnels[j + 2], tunnels[j + 3],
+            room.x1, room.y1, room.x2, room.y2)) {
+                if (isHorizontal) {
+                    t = tunnels[j + 2];
+                    tunnels[j + 2] = room.x1;
+                    tunnels.push(room.x2, tunnels[j + 1], t, tunnels[j + 3]);
+                    len += 4;
+                } else {
+                    t = tunnels[j + 3];
+                    tunnels[j + 3] = room.y1;
+                    tunnels.push(tunnels[j], room.y2, tunnels[j + 2], t);
+                    len += 4;
+                }
+            }
+        }
+    }
+}
+
 // normal distribution in [-3, 3]
 export function getBoxMullerGaussianNoise() {
     const u = Math.random();
