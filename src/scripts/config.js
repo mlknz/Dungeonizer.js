@@ -23,7 +23,7 @@ const config = {
         trashFloorY: -0.9,
 
         tunnelHeight: 1,
-        tunnelDebugHeight: 1,
+        tunnelDebugHeight: 1.2,
         tunnelColor: 0x772222,
         tunnelDebugColor: 0xaaaaaa
     }

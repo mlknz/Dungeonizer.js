@@ -3,7 +3,7 @@ import tunnelsFrag from './shaders/tunnels.frag';
 
 class Tunnels {
     // under assumption x1 <= x2 and y1 <= y2 for tunnels
-    constructor(tunnels, {isDebug, config}) {
+    constructor(tunnels, {isDebug, config}, h) {
         const offsets = [];
         const scales = [];
         const tHeight = isDebug ? config.tunnelDebugHeight : config.tunnelHeight;
@@ -19,7 +19,7 @@ class Tunnels {
             yS = isHorizontal ? 1 : tunnels[i + 3] - tunnels[i + 1];
 
             offsets.push(x, 0, y);
-            scales.push(xS, tHeight, yS);
+            scales.push(xS, h ? h : tHeight, yS);
         }
 
         const cubeGeom = new THREE.BoxBufferGeometry(1, 1, 1);
@@ -33,6 +33,7 @@ class Tunnels {
 
         const uniforms = THREE.UniformsUtils.clone(THREE.UniformsLib.lights);
         uniforms.color = {value: new THREE.Color(isDebug ? config.tunnelDebugColor : config.tunnelColor)};
+        if (h) uniforms.color = {value: new THREE.Color(0x888888)};
 
         const floorsMaterial = new THREE.RawShaderMaterial({
             uniforms,

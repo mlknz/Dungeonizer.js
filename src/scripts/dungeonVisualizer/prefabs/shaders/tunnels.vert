@@ -9,6 +9,7 @@ uniform mat4 projectionMatrix;
 
 varying vec3 vNormal;
 varying vec3 vColor;
+varying vec3 nothing;
 
 void main() {
     mat4 modelMat = mat4(
@@ -20,4 +21,5 @@ void main() {
 	gl_Position = projectionMatrix * viewMatrix * modelMat * vec4(position, 1.);
 
 	vNormal = mat3(viewMatrix * modelMat) * normal;
+    nothing = offset;
 }

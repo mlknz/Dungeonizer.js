@@ -31,9 +31,9 @@ const createDungeonMesh = function(dungeon, dungeonId) {
     root.add(tunnelsMesh);
 
     if (dungeon.walls) {
-        // const wallsMesh = new Tunnels(dungeon.walls, true);
-        // wallsMesh.frustumCulled = false;
-        // root.add(wallsMesh);
+        const wallsMesh = new Tunnels(dungeon.walls, {isDebug, config: config.visParams}, 6);
+        wallsMesh.frustumCulled = false;
+        root.add(wallsMesh);
     }
 
     if (isDebug) {
@@ -64,9 +64,9 @@ window.dungeonizer.initVisualizer = function(renderer) {
     let aspectRatio = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
     const camera = new THREE.PerspectiveCamera(60, aspectRatio, 0.1, 2000);
-    camera.position.z = 76;
+    camera.position.z = -20;
     camera.position.y = 70;
-    camera.position.x = 62;
+    camera.position.x = 0;
     camera.lookAt(new THREE.Vector3(0, 0, 0));
     camera.updateProjectionMatrix();
 

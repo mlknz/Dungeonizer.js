@@ -1,11 +1,10 @@
 class Walls {
-    constructor(dungeonRooms, tunnels) {
+    constructor(dungeonRooms, walls) {
         this.walls = [];
         this.dungeonRooms = dungeonRooms;
-        this.tunnels = tunnels;
 
-        this.createRoomWalls();
-        this.createTunnelWalls();
+        // this.createRoomWalls();
+        Array.prototype.push.apply(this.walls, walls);
     }
 
     createRoomWalls() {
@@ -18,42 +17,18 @@ class Walls {
     }
 
     createRoomPerimeterWall(room) {
-        const x1 = room.x - room.w / 2; // todo: +/- 1's
+        const x1 = room.x - room.w / 2 - 1;
         const x2 = room.x + room.w / 2;
-        const y1 = room.y - room.h / 2;
+        const y1 = room.y - room.h / 2 - 1;
         const y2 = room.y + room.h / 2;
 
         const roomPerimeter = [
-            x1, y1, x1, y2,
+            x1, y1 + 1, x1, y2,
             x1, y2, x2, y2,
-            x2, y1, x2, y2,
+            x2, y1, x2, y2 + 1,
             x1, y1, x2, y1
         ];
         return roomPerimeter;
-    }
-
-    // under assumption x1 <= x2 and y1 <= y2 for tunnels
-    createTunnelWalls() {
-        const tunnels = this.tunnels;
-        let tunnelWalls = null;
-
-        for (let i = 0; i < tunnels.length; i += 4) {
-            tunnelWalls = this.createTunnelWall(tunnels[i], tunnels[i + 1], tunnels[i + 2], tunnels[i + 3]);
-            Array.prototype.push.apply(this.walls, tunnelWalls);
-        }
-    }
-
-    createTunnelWall(ax, ay, bx, by) {
-        // sorting and -1 / +1 for handling L-shapes
-        const isHorizontal = Math.abs(ax - bx) > Math.abs(ay - by);
-        let tunnelWalls;
-        if (isHorizontal) {
-            tunnelWalls = [ax - 1, ay - 1, bx + 1, ay - 1, ax - 1, ay + 1, bx + 1, ay + 1];
-        } else {
-            tunnelWalls = [ax - 1, ay - 1, ax - 1, by + 1, ax + 1, ay - 1, ax + 1, by + 1];
-        }
-
-        return tunnelWalls;
     }
 
     removeWallWallIntersections() {
@@ -123,6 +98,8 @@ class Walls {
     // first segment always remains unchanged, second could and will break into 0, 1 or 2 pieces
     resolveSegmentSegment(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
         const result = [];
+        const isHor1 = ay2 - ay1 > ax2 - ax1;
+        const isHor2 = by2 - by1 > bx2 - bx1;
         // todo: replace with less ugly check for possible intersection :D
         if (((ax1 <= bx2 && ax1 >= bx1) || (ax2 <= bx2 && ax2 >= bx1) || (bx1 <= ax2 && bx1 >= ax1) || (bx2 <= ax2 && bx2 >= ax1)) &&
         ((ay2 <= by2 && ay2 >= by1) || (ay1 <= by2 && ay1 >= by1) || (by2 <= ay2 && by2 >= ay1) || (by1 <= ay2 && by1 >= ay1))) { // segments intersect

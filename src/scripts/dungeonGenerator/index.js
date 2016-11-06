@@ -33,9 +33,9 @@ const generateDungeonImpl = function({
     const leaveExtraEdgeOneFrom = Math.pow(100, 1 - Math.max(Math.min(connectivity, 1), 0));
     const minSpanningTree = generateMST(triangulation.edges, triangulation.gVerts, leaveExtraEdgeOneFrom);
 
-    const tunnels = new Tunnels(rooms.dungeonRooms, minSpanningTree.edges, minSpanningTree.leftAlive, mainRoomsCenters);
+    const tunnels = new Tunnels(rooms.dungeonRooms, minSpanningTree.edges, minSpanningTree.leftAlive, mainRoomsCenters, withWalls);
     rooms.attachIntersectedByTunnels(tunnels.tunnels, isDebug);
-    tunnels.cutTunnels(rooms.dungeonRooms, tunnels.tunnels);
+    tunnels.cutTunnels(rooms.dungeonRooms);
 
     const dungeon = {
         rooms: rooms.dungeonRooms,
@@ -43,10 +43,11 @@ const generateDungeonImpl = function({
     };
 
     if (withWalls) {
-        const walls = new Walls(rooms.dungeonRooms, tunnels.tunnels);
-        walls.removeWallWallIntersections();
-        walls.removeTunnelWallIntersections();
-        walls.removeRoomWallIntersections();
+        const walls = new Walls(rooms.dungeonRooms, tunnels.walls1.concat(tunnels.walls2));
+
+        // walls.removeTunnelWallIntersections();
+        // walls.removeRoomWallIntersections();
+        // walls.removeWallWallIntersections();
 
         dungeon.walls = walls.walls;
     }
