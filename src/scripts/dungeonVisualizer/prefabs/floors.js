@@ -2,14 +2,14 @@ import floorsVert from './shaders/floors.vert';
 import floorsFrag from './shaders/floors.frag';
 
 class Floors {
-    constructor(floors, {isTrashFloors, config}) {
+    constructor(floors, {isDebug, isTrashFloors, config}) {
         const offsets = [];
         const scales = [];
         const colors = [];
 
-        const mainFloorColor = config.floorTunnelColor;
-        const attachedFloorColor = config.attachedFloorColor;
-        const trashFloorColor = config.trashFloorColor;
+        const mainFloorColor = isDebug ? config.mainFloorDebugColor : config.floorTunnelColor;
+        const attachedFloorColor = config.attachedFloorDebugColor;
+        const trashFloorColor = config.trashFloorDebugColor;
         const floorY = isTrashFloors ? config.trashFloorY : 0;
 
         for (let i = 0; i < floors.length; i++) {
@@ -32,6 +32,7 @@ class Floors {
 
         const uniforms = THREE.UniformsUtils.clone(THREE.UniformsLib.lights);
         uniforms.opacity = {value: isTrashFloors ? 0.5 : 1};
+        uniforms.isDebug = {value: isDebug ? 1 : 0};
 
         const floorsMaterial = new THREE.RawShaderMaterial({
             uniforms,

@@ -7,12 +7,13 @@ varying vec2 vUv;
 #include <lights_pars>
 
 uniform float opacity;
+uniform float isDebug;
 
 void main() {
 
     vec2 uv = mod(vUv, 1.) - 0.5;
     float d = clamp(uv.x * uv.x + uv.y * uv.y, 0., 1.);
-	vec3 c = d * d * vColor;
+	vec3 c = vColor * (isDebug > 0.5 ? 1. : d * d);
 
     #if NUM_DIR_LIGHTS > 0
     vec3 light;

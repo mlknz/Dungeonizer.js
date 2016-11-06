@@ -22,7 +22,7 @@ const createDungeonMesh = function(dungeon, dungeonId) {
 
     const isDebug = dungeon.mstLines && dungeon.leftAliveLines && dungeon.delaunayTriangles && dungeon.trashRooms;
 
-    const roomsMesh = new Floors(dungeon.rooms, {isTrashFloors: false, config: config.visParams});
+    const roomsMesh = new Floors(dungeon.rooms, {isDebug, isTrashFloors: false, config: config.visParams});
     roomsMesh.frustumCulled = false;
     root.add(roomsMesh);
 
@@ -46,7 +46,7 @@ const createDungeonMesh = function(dungeon, dungeonId) {
         const leftAliveLinesMesh = new Lines(dungeon.leftAliveLines, 0xff0000);
         root.add(leftAliveLinesMesh);
 
-        const trashRoomsMesh = new Floors(dungeon.trashRooms, {isTrashFloors: true, config: config.visParams});
+        const trashRoomsMesh = new Floors(dungeon.trashRooms, {isDebug, isTrashFloors: true, config: config.visParams});
         trashRoomsMesh.frustumCulled = false;
         root.add(trashRoomsMesh);
     }

@@ -22,8 +22,9 @@ const config = {
         floorTunnelColor: [1, 1, 1],
         wallColor: [0.6, 0.6, 0.6],
 
-        attachedFloorColor: [0.1, 0.4, 0.04],
-        trashFloorColor: [0.3, 0.3, 0.3],
+        mainFloorDebugColor: [0.6, 0.1, 0.1],
+        attachedFloorDebugColor: [0.1, 0.4, 0.04],
+        trashFloorDebugColor: [0.3, 0.3, 0.3],
         trashFloorY: -0.9,
 
         tunnelDebugHeight: 1.2,
