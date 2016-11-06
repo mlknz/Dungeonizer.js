@@ -5,6 +5,8 @@ class Controls {
     constructor(camera, domElement) {
         this.orbitControls = new THREE.OrbitControls(camera, domElement);
         this.orbitControls.enableDamping = true;
+        this.orbitControls.minDistance = 1;
+        this.orbitControls.maxDistance = 1000;
         this.orbitControls.rotateSpeed = 0.25;
     }
 
