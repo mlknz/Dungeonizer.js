@@ -47,8 +47,8 @@ const generateDungeonImpl = function({
     if (withWalls) {
         const walls = new Walls(rooms.dungeonRooms, tunnels.walls1.concat(tunnels.walls2));
         resolveAlignedRectanglesSegmentsIntersections(rooms.dungeonRooms, walls.walls);
-        // walls.removeTunnelWallIntersections();
-        // walls.removeWallWallIntersections();
+        walls.removeTunnelWallIntersections(tunnels.tunnels);
+        walls.removeWallWallIntersections();
 
         dungeon.walls = walls.walls;
     }

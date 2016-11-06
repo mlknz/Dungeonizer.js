@@ -35,8 +35,8 @@ class Walls {
         this.removeSegmentsIntersections(this.walls, true);
     }
 
-    removeTunnelWallIntersections() {
-        this.removeSegmentsIntersections(this.tunnels, false);
+    removeTunnelWallIntersections(tunnels) {
+        this.removeSegmentsIntersections(tunnels, false);
     }
 
     // under assumption x1 <= x2 and y1 <= y2 for tunnels
@@ -54,10 +54,10 @@ class Walls {
                         walls[j], walls[j + 1], walls[j + 2], walls[j + 3]
                     );
                     if (pieces.length < 4) { // todo: perform wall removal
-                        walls[j] = 10000 + i;
-                        walls[j + 1] = 10000 + i;
-                        walls[j + 2] = 10000 + i + 1;
-                        walls[j + 3] = 10000 + i + 1;
+                        walls[j] = 10000 + 20 * i;
+                        walls[j + 1] = 10000 + 20 * i;
+                        walls[j + 2] = 10000 + 20 * i;
+                        walls[j + 3] = 10000 + 20 * i + 2;
                     } else {
                         walls[j] = pieces[0];
                         walls[j + 1] = pieces[1];
@@ -80,27 +80,37 @@ class Walls {
     // first segment always remains unchanged, second could and will break into 0, 1 or 2 pieces
     resolveSegmentSegment(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
         const result = [];
-        const isHor1 = ay2 - ay1 > ax2 - ax1;
-        const isHor2 = by2 - by1 > bx2 - bx1;
-        // todo: replace with less ugly check for possible intersection :D
-        if (((ax1 <= bx2 && ax1 >= bx1) || (ax2 <= bx2 && ax2 >= bx1) || (bx1 <= ax2 && bx1 >= ax1) || (bx2 <= ax2 && bx2 >= ax1)) &&
-        ((ay2 <= by2 && ay2 >= by1) || (ay1 <= by2 && ay1 >= by1) || (by2 <= ay2 && by2 >= ay1) || (by1 <= ay2 && by1 >= ay1))) { // segments intersect
+        const isHorizontal1 = ax2 - ax1 > ay2 - ay1;
+        const isHorizontal2 = bx2 - bx1 > by2 - by1;
 
-            if (by2 - by1 < bx2 - bx1) { // horizontal b breaks
-                if (bx1 < ax1) {
-                    result.push(bx1, by1, ax1 - 1, by1);
-                }
-                if (bx2 > ax2) {
-                    result.push(ax2 + 1, by2, bx2, by2);
-                }
-            } else { // vertical b breaks
-                if (by1 < ay1) {
-                    result.push(bx1, by1, bx1, ay1 - 1);
-                }
-                if (by2 > ay2) {
-                    result.push(bx2, ay2 + 1, bx2, by2);
-                }
-            }
+        if (isHorizontal1 && isHorizontal2 &&
+            by1 === ay1 &&
+            ((ax1 <= bx2 && ax1 >= bx1) || (ax2 <= bx2 && ax2 >= bx1) || (bx1 <= ax2 && bx1 >= ax1) || (bx2 <= ax2 && bx2 >= ax1))) {
+
+            if (bx1 < ax1) result.push(bx1, by1, ax1, by1);
+            if (bx2 > ax2) result.push(ax2, by2, bx2, by2);
+
+        } else if (!isHorizontal1 && isHorizontal2 &&
+            by1 >= ay1 && by1 < ay2 &&
+            ((ax1 <= bx2 && ax1 >= bx1) || (ax2 <= bx2 && ax2 >= bx1) || (bx1 <= ax2 && bx1 >= ax1) || (bx2 <= ax2 && bx2 >= ax1))) {
+
+            if (bx1 < ax1) result.push(bx1, by1, ax1, by1);
+            if (bx2 > ax2) result.push(ax2 + 1, by2, bx2, by2);
+
+        } else if (!isHorizontal1 && !isHorizontal2 &&
+        ax1 === bx2 &&
+        ((by1 <= ay2 && by1 >= ay1) || (by2 <= ay2 && by2 >= ay1) || (ay1 <= by2 && ay1 >= by1) || (ay2 <= by2 && ay2 >= by1))) {
+
+            if (by1 < ay1) result.push(bx1, by1, bx1, ay1);
+            if (by2 > ay2) result.push(bx2, ay2, bx2, by2);
+
+        } else if (isHorizontal1 && !isHorizontal2 &&
+        bx1 >= ax1 && bx1 < ax2 &&
+        ((ay2 <= by2 && ay2 >= by1) || (ay1 <= by2 && ay1 >= by1) || (by2 <= ay2 && by2 >= ay1) || (by1 <= ay2 && by1 >= ay1))) {
+
+            if (by1 < ay1) result.push(bx1, by1, bx1, ay1);
+            if (by2 > ay2) result.push(bx2, ay2 + 1, bx2, by2);
+
         } else { // segments do not intersect
             result.push(bx1, by1, bx2, by2);
         }

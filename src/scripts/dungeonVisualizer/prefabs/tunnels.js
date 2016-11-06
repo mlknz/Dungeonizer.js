@@ -18,8 +18,10 @@ class Tunnels {
             y = isHorizontal ? (tunnels[i + 1] + 0.5) : (tunnels[i + 1] + tunnels[i + 3]) / 2;
             yS = isHorizontal ? 1 : tunnels[i + 3] - tunnels[i + 1];
 
-            offsets.push(x, 0, y);
-            scales.push(xS, h ? h : tHeight, yS);
+            if ((tunnels[i + 2] - tunnels[i] > 0.5) || (tunnels[i + 3] - tunnels[i + 1] > 0.5)) { // todo: handle empty pieces
+                offsets.push(x, 0, y);
+                scales.push(xS, h ? h : tHeight, yS);
+            }
         }
 
         const cubeGeom = new THREE.BoxBufferGeometry(1, 1, 1);
