@@ -7,7 +7,7 @@ class Floors {
         const scales = [];
         const colors = [];
 
-        const mainFloorColor = config.mainFloorColor;
+        const mainFloorColor = config.floorTunnelColor;
         const attachedFloorColor = config.attachedFloorColor;
         const trashFloorColor = config.trashFloorColor;
         const floorY = isTrashFloors ? config.trashFloorY : 0;
@@ -24,6 +24,7 @@ class Floors {
 
         geom.addAttribute('position', cubeGeom.attributes.position);
         geom.addAttribute('normal', cubeGeom.attributes.normal);
+        geom.addAttribute('uv', cubeGeom.attributes.uv);
         geom.setIndex(cubeGeom.index);
         geom.addAttribute('offset', new THREE.InstancedBufferAttribute(new Float32Array(offsets), 3, 1));
         geom.addAttribute('scale', new THREE.InstancedBufferAttribute(new Float32Array(scales), 3, 1));

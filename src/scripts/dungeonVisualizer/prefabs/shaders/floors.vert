@@ -1,5 +1,6 @@
 attribute vec3 position;
 attribute vec3 normal;
+attribute vec2 uv;
 
 attribute vec3 offset;
 attribute vec3 scale;
@@ -10,6 +11,7 @@ uniform mat4 projectionMatrix;
 
 varying vec3 vNormal;
 varying vec3 vColor;
+varying vec2 vUv;
 
 void main() {
     mat4 modelMat = mat4(
@@ -22,4 +24,5 @@ void main() {
 
 	vNormal = mat3(viewMatrix * modelMat) * normal;
 	vColor = color;
+    vUv = uv * vec2(scale.x, scale.z);
 }

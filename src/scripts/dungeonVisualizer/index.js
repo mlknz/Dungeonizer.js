@@ -64,9 +64,9 @@ window.dungeonizer.initVisualizer = function(renderer) {
     let aspectRatio = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
     const camera = new THREE.PerspectiveCamera(60, aspectRatio, 0.1, 2000);
-    camera.position.z = -40;
-    camera.position.y = 80;
-    camera.position.x = 0;
+    camera.position.z = -60;
+    camera.position.y = 60;
+    camera.position.x = 50;
     camera.lookAt(new THREE.Vector3(0, 0, 0));
     camera.updateProjectionMatrix();
 

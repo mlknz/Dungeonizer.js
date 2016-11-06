@@ -1,6 +1,9 @@
 import tunnelsVert from './shaders/tunnels.vert';
 import tunnelsFrag from './shaders/tunnels.frag';
 
+import floorsVert from './shaders/floors.vert';
+import floorsFrag from './shaders/floors.frag';
+
 class Tunnels {
     // under assumption x1 <= x2 and y1 <= y2 for tunnels
     constructor(tunnels, {isDebug, config}, isWall) {
@@ -8,7 +11,7 @@ class Tunnels {
         const scales = [];
         const colors = [];
 
-        const c = isWall ? config.wallColor : isDebug ? config.tunnelDebugColor : config.tunnelColor;
+        const c = isWall ? config.wallColor : isDebug ? config.tunnelDebugColor : config.floorTunnelColor;
         const h = isWall ? config.wallHeight : isDebug ? config.tunnelDebugHeight : config.tunnelHeight;
         const hOffset = isWall ? h / 2 - 0.5 : 0;
 
@@ -38,9 +41,11 @@ class Tunnels {
 
         const cubeGeom = new THREE.BoxBufferGeometry(1, 1, 1);
         const geom = new THREE.InstancedBufferGeometry();
-        for (let i = 0; i < cubeGeom.attributes.position.array.length / 3; i++) {
-            if (cubeGeom.attributes.position.array[i * 3 + 1] < 0) cubeGeom.attributes.uv.array[i * 2 + 1] = 0;
-            else cubeGeom.attributes.uv.array[i * 2 + 1] = 1;
+        if (isWall || isDebug) {
+            for (let i = 0; i < cubeGeom.attributes.position.array.length / 3; i++) {
+                if (cubeGeom.attributes.position.array[i * 3 + 1] < 0) cubeGeom.attributes.uv.array[i * 2 + 1] = 0;
+                else cubeGeom.attributes.uv.array[i * 2 + 1] = 1;
+            }
         }
 
         geom.addAttribute('position', cubeGeom.attributes.position);
@@ -55,8 +60,8 @@ class Tunnels {
 
         const floorsMaterial = new THREE.RawShaderMaterial({
             uniforms,
-            vertexShader: tunnelsVert,
-            fragmentShader: tunnelsFrag,
+            vertexShader: (isWall || isDebug) ? tunnelsVert : floorsVert,
+            fragmentShader: (isWall || isDebug) ? tunnelsFrag : floorsFrag,
             side: THREE.FrontSide,
             transparent: false,
             lights: true
