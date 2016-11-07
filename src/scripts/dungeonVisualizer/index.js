@@ -8,78 +8,31 @@ import config from '../config.js';
 
 class DungeonVisualizer {
     constructor(renderer) {
-        renderer.setClearColor(0x111111, false);
-        renderer.setPixelRatio(window.devicePixelRatio || 1);
+        this.renderer = renderer;
+        this.renderer.setClearColor(0x111111, false);
+        this.renderer.setPixelRatio(window.devicePixelRatio || 1);
 
-        const gl = renderer.getContext();
+        const gl = this.renderer.getContext();
         const aspectRatio = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
-        const camera = new THREE.PerspectiveCamera(60, aspectRatio, 0.1, 2000);
-        camera.position.z = -90;
-        camera.position.y = 110;
-        camera.position.x = 50;
-        camera.lookAt(new THREE.Vector3(0, 0, 0));
-        camera.updateProjectionMatrix();
+        this.camera = new THREE.PerspectiveCamera(60, aspectRatio, 0.1, 2000);
+        this.camera.position.set(-90, 110, 50);
+        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+        this.camera.updateProjectionMatrix();
 
-        this.controls = new Controls(camera, renderer.domElement);
+        this.controls = new Controls(this.camera, this.renderer.domElement);
 
-        const scene = new THREE.Scene();
+        this.scene = new THREE.Scene();
 
         const light = new THREE.AmbientLight(0x202020);
-        scene.add(light);
+        this.scene.add(light);
 
         const dirLight = new THREE.DirectionalLight(0x707070);
         dirLight.position.set(10, 20, 10);
-        scene.add(dirLight);
+        this.scene.add(dirLight);
         const dirLight2 = new THREE.DirectionalLight(0x707070);
         dirLight2.position.set(-30, 20, 10);
-        scene.add(dirLight2);
-
-        this.scene = scene;
-        this.camera = camera;
-        this.renderer = renderer;
-    }
-
-    update() {
-        this.controls.update();
-        this.renderer.render(this.scene, this.camera);
-    }
-
-    resize(width, height) {
-        const aspectRatio = width / height;
-        if (this.camera.aspect !== aspectRatio) {
-            this.camera.aspect = aspectRatio;
-            this.camera.updateProjectionMatrix();
-        }
-    }
-
-    dispose() {
-        this.controls.dispose();
-        this.clearScene(this.scene);
-    }
-
-    makeDungeonVisual(dungeon, dungeonId) {
-        this.clearScene(this.scene);
-        const dungeonShape = this.createDungeonMesh(dungeon, dungeonId);
-        this.scene.add(dungeonShape);
-    }
-
-    clearScene(s) {
-        s.children.forEach(obj => {
-            if (obj.name.includes('Dungeon')) {
-                obj.children.forEach(child => {
-                    // child.material.uuid += Math.random();
-                    // child.uuid += Math.random();
-                    // child.material.dispose();
-                    child.material.dispose();
-                    child.geometry.dispose();
-                    // child.name = '';
-                    child.parent.remove(child);
-                    // child = null;
-                });
-                obj.parent.remove(obj);
-            }
-        });
+        this.scene.add(dirLight2);
     }
 
     createDungeonMesh(dungeon, dungeonId) {
@@ -87,20 +40,18 @@ class DungeonVisualizer {
         const withWalls = Boolean(dungeon.walls);
 
         const root = new THREE.Object3D();
-        root.name = 'Dungeon_' + dungeonId + isDebug + withWalls;
+        root.name = 'Dungeon_' + dungeonId;
 
         const roomsMesh = new Floors(dungeon.rooms, {isDebug, isTrashFloors: false, config: config.visParams});
         roomsMesh.frustumCulled = false;
         root.add(roomsMesh);
-        roomsMesh.uuid += isDebug + withWalls;
-        roomsMesh.name += isDebug + withWalls;
 
         const tunnelsMesh = new Tunnels(dungeon.tunnels, {isDebug, config: config.visParams});
         tunnelsMesh.frustumCulled = false;
         root.add(tunnelsMesh);
 
         if (withWalls) {
-            const wallsMesh = new Tunnels(dungeon.walls, {isDebug, config: config.visParams}, 6);
+            const wallsMesh = new Tunnels(dungeon.walls, {isDebug, config: config.visParams, isWall: true});
             wallsMesh.frustumCulled = false;
             root.add(wallsMesh);
         }
@@ -121,6 +72,55 @@ class DungeonVisualizer {
         }
 
         return root;
+    }
+
+    update() {
+        this.controls.update();
+        this.renderer.render(this.scene, this.camera);
+    }
+
+    resize(width, height) {
+        const aspectRatio = width / height;
+        if (this.camera.aspect !== aspectRatio) {
+            this.camera.aspect = aspectRatio;
+            this.camera.updateProjectionMatrix();
+        }
+    }
+
+    dispose() {
+        this.controls.dispose();
+        this.clearScene();
+    }
+
+    makeDungeonVisual(dungeon, dungeonId) {
+        this.clearScene();
+        const dungeonShape = this.createDungeonMesh(dungeon, dungeonId);
+        this.scene.add(dungeonShape);
+    }
+
+    clearScene() {
+        for (let i = this.scene.children.length - 1; i >= 0; i--) {
+            const obj = this.scene.children[i];
+            if (obj.name.includes('Dungeon')) {
+                for (let j = obj.children.length - 1; j >= 0; j--) {
+                    const child = obj.children[j];
+                    if (child instanceof THREE.Mesh) {
+                        child.material.dispose();
+                        child.geometry.dispose();
+                    } else {
+                        for (let k = child.children.length - 1; k >= 0; k--) {
+                            const line = child.children[k];
+                            line.material.dispose();
+                            line.geometry.dispose();
+                            line.parent.remove(line);
+                        }
+                    }
+                    child.parent.remove(child);
+                }
+
+                obj.parent.remove(obj);
+            }
+        }
     }
 }
 

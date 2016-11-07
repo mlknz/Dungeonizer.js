@@ -44,9 +44,7 @@ class Floors {
         });
 
         const floorsMesh = new THREE.Mesh(geom, floorsMaterial);
-        floorsMesh.uuid += Math.random();
-        floorsMesh.material.uuid += Math.random();
-        floorsMesh.material.uniforms.isDebug.value = isDebug ? 1 : 0;
+        floorsMesh.name = 'floors_isTrash:' + isTrashFloors + '_isDebug:' + isDebug;
         return floorsMesh;
     }
 }

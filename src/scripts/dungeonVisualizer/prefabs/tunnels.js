@@ -6,7 +6,7 @@ import floorsFrag from './shaders/floors.frag';
 
 class Tunnels {
     // under assumption x1 <= x2 and y1 <= y2 for tunnels
-    constructor(tunnels, {isDebug, config}, isWall) {
+    constructor(tunnels, {isDebug, config, isWall}) {
         const offsets = [];
         const scales = [];
         const colors = [];
@@ -56,7 +56,7 @@ class Tunnels {
         const uniforms = THREE.UniformsUtils.clone(THREE.UniformsLib.lights);
         uniforms.isDebug = {value: isDebug ? 1 : 0};
 
-        const floorsMaterial = new THREE.RawShaderMaterial({
+        const tunnelsMaterial = new THREE.RawShaderMaterial({
             uniforms,
             vertexShader: (isWall || isDebug) ? tunnelsVert : floorsVert,
             fragmentShader: (isWall || isDebug) ? tunnelsFrag : floorsFrag,
@@ -64,8 +64,10 @@ class Tunnels {
             transparent: false,
             lights: true
         });
+        const tunnelsMesh = new THREE.Mesh(geom, tunnelsMaterial);
+        tunnelsMesh.name = (isWall ? 'walls_isDebug:' : 'tunnels_isDebug') + isDebug;
 
-        return new THREE.Mesh(geom, floorsMaterial);
+        return tunnelsMesh;
     }
 }
 

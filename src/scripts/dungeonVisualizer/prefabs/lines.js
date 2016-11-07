@@ -1,6 +1,10 @@
+let ind = 0;
+
 class Lines {
     constructor(triangles, color) {
         const trianglesRoot = new THREE.Object3D();
+        trianglesRoot.name = 'lines_container_' + ind;
+        ind++;
         const lineMaterial = new THREE.LineBasicMaterial({color});
 
         for (let i = 0; i < triangles.length; i += 4) {

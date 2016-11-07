@@ -7,7 +7,7 @@ class AppUi {
 
         this.dungeonParams = config.dungeonParams;
 
-        const gui = new dat.GUI({width: 400});
+        const gui = new dat.GUI({width: 400}); // eslint-disable-line
         gui.add(this.dungeonParams, 'dungeonSize').min(1).max(120).step(1);
         const roomsFolder = gui.addFolder('Rooms');
         roomsFolder.add(this.dungeonParams, 'roomSizeDistribution', { normal: 'normal', uniform: 'uniform' });
