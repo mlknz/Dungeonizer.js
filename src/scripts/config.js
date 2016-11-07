@@ -6,12 +6,12 @@ const config = {
     },
     dungeonParams: {
         roomSizeDistribution: 'normal',
-        dungeonSize: 15,
+        dungeonSize: 10,
         roomSizeMean: 9,
         roomSizeDeviation: 0.75,
         mainRoomThreshold: 1.1,
-        connectivity: 0.55,
-        density: 0.3,
+        connectivity: 0.7,
+        density: 0.6,
         fromDungeonId: false,
         dungeonId: ''
     },

@@ -50,14 +50,17 @@ class Rooms {
           const rooms = this.rooms;
           const roomsAmount = this.roomsAmount;
           const maxRoomSize = this.maxRoomSize;
+
+          const radialStep = Math.max(1 - this.density, 0) * maxRoomSize;
           const maxR = roomsAmount * maxRoomSize * 2;
+
           for (let i = 1; i < roomsAmount; i++) {
               const roomAngle = Math.random() * 2 * Math.PI;
 
               let posX = 0;
               let posY = 0;
-              const dirX = Math.cos(roomAngle);
-              const dirY = Math.sin(roomAngle);
+              const dirX = Math.cos(roomAngle) * radialStep;
+              const dirY = Math.sin(roomAngle) * radialStep;
 
               for (let k = 0; k < maxR; k++) {
 
@@ -80,7 +83,6 @@ class Rooms {
                       // make a round trying to place room closer to center
                       let d = Math.sqrt(posX * posX + posY * posY);
                       let curAngle = roomAngle;
-                      let curPosX, curPosY;
 
                       const maxStepsAmount = Math.min(d, this.maxRoomRoundStepsAmount);
                       const angleStep = 1 / maxStepsAmount + (1 - this.density) * (2 * Math.PI - 1 / maxStepsAmount);
@@ -88,15 +90,13 @@ class Rooms {
                       while (curAngle - roomAngle < Math.PI * 2) {
                           curAngle += angleStep;
 
-                          for (let ii = d; ii > 0; ii--) {
-                              curPosX = ii * Math.cos(curAngle);
-                              curPosY = ii * Math.sin(curAngle);
+                          for (let ii = d; ii > 0; ii -= radialStep) {
+                              rooms[i].x = ii * Math.cos(curAngle);
+                              rooms[i].y = ii * Math.sin(curAngle);
+                              this.integerizeRoomPlacement(rooms[i]);
+
                               collidedByAny = false;
                               for (let j = 0; j < i; j++) {
-                                  rooms[i].x = curPosX;
-                                  rooms[i].y = curPosY;
-                                  this.integerizeRoomPlacement(rooms[i]);
-
                                   if (rectanglesTouched(rooms[j], rooms[i])) {
                                       collidedByAny = true;
                                       break;
@@ -104,8 +104,8 @@ class Rooms {
                               }
                               if (!collidedByAny) {
                                   d = ii;
-                                  posX = curPosX;
-                                  posY = curPosY;
+                                  posX = rooms[i].x;
+                                  posY = rooms[i].y;
                               }
                           }
 
