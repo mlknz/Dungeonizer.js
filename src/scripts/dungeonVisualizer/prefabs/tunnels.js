@@ -54,6 +54,7 @@ class Tunnels {
         geom.addAttribute('color', new THREE.InstancedBufferAttribute(new Float32Array(colors), 3, 1));
 
         const uniforms = THREE.UniformsUtils.clone(THREE.UniformsLib.lights);
+        uniforms.isDebug = {value: isDebug ? 1 : 0};
 
         const floorsMaterial = new THREE.RawShaderMaterial({
             uniforms,

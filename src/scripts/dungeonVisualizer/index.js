@@ -12,43 +12,50 @@ import config from '../config.js';
 
 const clearScene = function(scene) {
     scene.children.forEach(obj => {
-        if (obj.name.includes('Dungeon')) scene.remove(obj);
+        if (obj.name.includes('Dungeon')) {
+            obj.children.forEach(child => {
+                child.material = null;
+                obj.remove(child);
+                child = null;
+            });
+            scene.remove(obj);
+        }
     });
 };
 
-const createDungeonMesh = function(dungeon, dungeonId) {
+const createDungeonMesh = function(dungeon, dungeonId, withWalls, isDebug) {
     const root = new THREE.Object3D();
     root.name = 'Dungeon_' + dungeonId;
 
-    const isDebug = dungeon.mstLines && dungeon.leftAliveLines && dungeon.delaunayTriangles && dungeon.trashRooms;
+    // const isDebug = Boolean(dungeon.mstLines && dungeon.leftAliveLines && dungeon.delaunayTriangles && dungeon.trashRooms);
 
-    const roomsMesh = new Floors(dungeon.rooms, {isDebug, isTrashFloors: false, config: config.visParams});
+    const roomsMesh = new Floors(dungeon.rooms, isDebug, false, config.visParams);
     roomsMesh.frustumCulled = false;
     root.add(roomsMesh);
 
-    const tunnelsMesh = new Tunnels(dungeon.tunnels, {isDebug, config: config.visParams});
-    tunnelsMesh.frustumCulled = false;
-    root.add(tunnelsMesh);
+    // const tunnelsMesh = new Tunnels(dungeon.tunnels, {isDebug, config: config.visParams});
+    // tunnelsMesh.frustumCulled = false;
+    // root.add(tunnelsMesh);
 
     if (dungeon.walls) {
-        const wallsMesh = new Tunnels(dungeon.walls, {isDebug, config: config.visParams}, 6);
-        wallsMesh.frustumCulled = false;
-        root.add(wallsMesh);
+        // const wallsMesh = new Tunnels(dungeon.walls, {isDebug, config: config.visParams}, 6);
+        // wallsMesh.frustumCulled = false;
+        // root.add(wallsMesh);
     }
-
+    console.log(isDebug);
     if (isDebug) {
-        const triangulationLinesMesh = new Lines(dungeon.delaunayTriangles, 0x888888);
-        root.add(triangulationLinesMesh);
+        // const triangulationLinesMesh = new Lines(dungeon.delaunayTriangles, 0x888888);
+        // root.add(triangulationLinesMesh);
+        //
+        // const mstLinesMesh = new Lines(dungeon.mstLines, 0x0000ff);
+        // root.add(mstLinesMesh);
+        //
+        // const leftAliveLinesMesh = new Lines(dungeon.leftAliveLines, 0xff0000);
+        // root.add(leftAliveLinesMesh);
 
-        const mstLinesMesh = new Lines(dungeon.mstLines, 0x0000ff);
-        root.add(mstLinesMesh);
-
-        const leftAliveLinesMesh = new Lines(dungeon.leftAliveLines, 0xff0000);
-        root.add(leftAliveLinesMesh);
-
-        const trashRoomsMesh = new Floors(dungeon.trashRooms, {isDebug, isTrashFloors: true, config: config.visParams});
-        trashRoomsMesh.frustumCulled = false;
-        root.add(trashRoomsMesh);
+        // const trashRoomsMesh = new Floors(dungeon.trashRooms, {isDebug, isTrashFloors: true, config: config.visParams});
+        // trashRoomsMesh.frustumCulled = false;
+        // root.add(trashRoomsMesh);
     }
 
     return root;
@@ -101,9 +108,10 @@ window.dungeonizer.initVisualizer = function(renderer) {
             controls.dispose();
             clearScene(scene);
         },
-        makeDungeonVisual(dungeon, dungeonId) {
+        makeDungeonVisual(dungeon, dungeonId, withWalls, isDebug) {
             clearScene(scene);
-            const dungeonShape = createDungeonMesh(dungeon, dungeonId);
+            const dungeonShape = createDungeonMesh(dungeon, dungeonId, withWalls, isDebug);
+            console.log(dungeonShape.children[0]);
             scene.add(dungeonShape);
         }
     };

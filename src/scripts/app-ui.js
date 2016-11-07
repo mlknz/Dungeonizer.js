@@ -17,8 +17,8 @@ class AppUi {
         // roomsFolder.open();
         gui.add(this.dungeonParams, 'connectivity').min(0).max(1).step(0.01);
         gui.add(this.dungeonParams, 'density').min(0).max(1).step(0.01);
-        gui.add(config.generationMode, 'withWalls');
-        gui.add(config.generationMode, 'isDebug');
+        gui.add(config.generationMode, 'withWalls').onChange(() => { this.resetDungeon(true); });
+        gui.add(config.generationMode, 'isDebug').onChange(() => { this.resetDungeon(true); });
         gui.add(this.dungeonParams, 'fromDungeonId');
         gui.add(this.dungeonParams, 'dungeonId').onChange().listen();
 
@@ -48,8 +48,8 @@ class AppUi {
         return dungeonId;
     }
 
-    resetDungeon() {
-        const dungeonId = this.dungeonParams.fromDungeonId ? this.dungeonParams.dungeonId : this.generateNewDungeonId();
+    resetDungeon(forceFromId) {
+        const dungeonId = (forceFromId || this.dungeonParams.fromDungeonId) ? this.dungeonParams.dungeonId : this.generateNewDungeonId();
         this.dungeonParams.dungeonId = dungeonId;
 
         const dungeon = window.dungeonizer.generateDungeonById(
@@ -59,7 +59,8 @@ class AppUi {
         );
         this.dungeon = dungeon;
 
-        this.dungeonVisualizer.makeDungeonVisual(dungeon, dungeonId);
+        this.dungeonVisualizer.makeDungeonVisual(this.dungeon, this.dungeonParams.dungeonId, config.generationMode.withWalls,
+        config.generationMode.isDebug);
     }
 
     exportDungeon(dungeon, dungeonId) {

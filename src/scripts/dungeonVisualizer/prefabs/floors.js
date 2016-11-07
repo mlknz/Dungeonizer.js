@@ -2,7 +2,7 @@ import floorsVert from './shaders/floors.vert';
 import floorsFrag from './shaders/floors.frag';
 
 class Floors {
-    constructor(floors, {isDebug, isTrashFloors, config}) {
+    constructor(floors, isDebug, isTrashFloors, config) {
         const offsets = [];
         const scales = [];
         const colors = [];
@@ -44,7 +44,9 @@ class Floors {
         });
 
         const floorsMesh = new THREE.Mesh(geom, floorsMaterial);
-
+        floorsMesh.uuid += Math.random();
+        floorsMesh.material.uuid += Math.random();
+        floorsMesh.material.uniforms.isDebug.value = isDebug ? 1 : 0;
         return floorsMesh;
     }
 }
