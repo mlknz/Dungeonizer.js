@@ -53,11 +53,11 @@ class Walls {
                         tunnels[i], tunnels[i + 1], tunnels[i + 2], tunnels[i + 3],
                         walls[j], walls[j + 1], walls[j + 2], walls[j + 3]
                     );
-                    if (pieces.length < 4) { // todo: perform wall removal
-                        walls[j] = 10000 + 20 * i;
-                        walls[j + 1] = 10000 + 20 * i;
-                        walls[j + 2] = 10000 + 20 * i;
-                        walls[j + 3] = 10000 + 20 * i + 2;
+                    if (pieces.length < 4) { // empty walls will be removed in removeZeroLengthWalls()
+                        walls[j] = 0;
+                        walls[j + 1] = 0;
+                        walls[j + 2] = 0;
+                        walls[j + 3] = 0;
                     } else {
                         walls[j] = pieces[0];
                         walls[j + 1] = pieces[1];

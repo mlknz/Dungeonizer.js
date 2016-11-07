@@ -34,12 +34,13 @@ class App {
         appUi.resetDungeon();
 
         const gl = renderer.getContext();
+        const devicePixelRatio = window.devicePixelRatio || 1;
         function resize() {
             const width = canvas.clientWidth;
             const height = canvas.clientHeight;
             if (canvas.width !== width || canvas.height !== height) {
-                canvas.width = width;
-                canvas.height = height;
+                canvas.width = width * devicePixelRatio;
+                canvas.height = height * devicePixelRatio;
 
                 dungeonVisualizer.resize(width, height);
                 gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
