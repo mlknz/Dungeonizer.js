@@ -17,9 +17,8 @@ module.exports = (opts) => {
 
     return {
         entry: {
-            app: ['./src/scripts/index.js'],
-            vis: ['./src/scripts/dungeonVisualizer/index.js'],
-            gen: ['./src/scripts/dungeonGenerator/index.js']
+            dungeonVisualizer: ['./src/scripts/index.js'],
+            dungeonizer: ['./src/scripts/dungeonGenerator/index.js']
         },
         output: {
             path: path.join(__dirname, 'dist'),

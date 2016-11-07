@@ -2,7 +2,7 @@ import floorsVert from './shaders/floors.vert';
 import floorsFrag from './shaders/floors.frag';
 
 class Floors {
-    constructor(floors, isDebug, isTrashFloors, config) {
+    constructor(floors, {isDebug, isTrashFloors, config}) {
         const offsets = [];
         const scales = [];
         const colors = [];

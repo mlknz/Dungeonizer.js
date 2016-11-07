@@ -3,6 +3,8 @@ if (module.hot) {
 }
 
 const webgldetection = require('./webgldetection');
+
+import DungeonVisualizer from './dungeonVisualizer';
 import AppUi from './app-ui.js';
 
 class App {
@@ -26,7 +28,7 @@ class App {
         root.appendChild(canvas);
         root.style.backgroundColor = 'red';
 
-        const dungeonVisualizer = window.dungeonizer.initVisualizer(renderer);
+        const dungeonVisualizer = new DungeonVisualizer(renderer);
 
         const appUi = new AppUi(dungeonVisualizer);
         appUi.resetDungeon();

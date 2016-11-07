@@ -59,8 +59,7 @@ class AppUi {
         );
         this.dungeon = dungeon;
 
-        this.dungeonVisualizer.makeDungeonVisual(this.dungeon, this.dungeonParams.dungeonId, config.generationMode.withWalls,
-        config.generationMode.isDebug);
+        this.dungeonVisualizer.makeDungeonVisual(this.dungeon, this.dungeonParams.dungeonId);
     }
 
     exportDungeon(dungeon, dungeonId) {
