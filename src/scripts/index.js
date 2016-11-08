@@ -47,9 +47,10 @@ class App {
             }
         }
 
+        const clock = new THREE.Clock();
         function animate() {
             resize();
-            dungeonVisualizer.update();
+            dungeonVisualizer.update(clock.getDelta());
             requestAnimationFrame(animate);
         }
 

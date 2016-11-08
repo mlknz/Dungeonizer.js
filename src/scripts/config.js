@@ -19,9 +19,7 @@ const config = {
         dungeonId: ''
     },
     controls: {
-        cameraPos: [-90, 110, 50],
-        pointerLockEntryYaw: -1.5, // <===>
-        pointerLockEntryPitch: -0.3 // ^ v
+        cameraPos: [-90, 110, 50]
     },
     visParams: {
         floorHeight: 1,

@@ -15,7 +15,7 @@ class DungeonVisualizer {
         const gl = this.renderer.getContext();
         const aspectRatio = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
-        this.camera = new THREE.PerspectiveCamera(60, aspectRatio, 0.1, 2000);
+        this.camera = new THREE.PerspectiveCamera(60, aspectRatio, 0.01, 1000);
         this.camera.position.fromArray(config.controls.cameraPos);
         this.camera.lookAt(new THREE.Vector3(0, 0, 0));
         this.camera.updateProjectionMatrix();
@@ -74,8 +74,8 @@ class DungeonVisualizer {
         return root;
     }
 
-    update() {
-        this.controls.update();
+    update(dt) {
+        this.controls.update(dt);
         this.renderer.render(this.scene, this.camera);
     }
 

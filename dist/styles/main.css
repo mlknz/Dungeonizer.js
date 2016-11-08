@@ -10,3 +10,56 @@ body {
     background: linear-gradient(45deg, #282222 0%, #000000 100%);
     position: absolute;
 }
+.buttonsRoot {
+    position: absolute;
+    bottom: 0;
+    right: 35%;
+    width: 30%;
+    height: 15%;
+    font-size: 20px;
+
+    background: red;
+    font-size: 4vh;
+    font-weight: bold;
+    display: table;
+
+    -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+   -khtml-user-select: none; /* Konqueror */
+     -moz-user-select: none; /* Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none; /* Non-prefixed version, currently
+                                not supported by any browser */
+}
+.walkerButton {
+    width: 49%;
+    height: 100%;
+    background: white;
+    top: 0;
+    cursor: pointer;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    line-height: 100%;
+}
+
+.generateButton {
+    width: 49%;
+    height: 100%;
+    text-align: center;
+    cursor: pointer;
+    display: table-cell;
+    background: white;
+    vertical-align: middle;
+    line-height: 100%;
+}
+
+.walkerButton:hover, .generateButton:hover{
+    background: blue;
+}
+
+.dummy {
+    width: 2%;
+    height: 100%;
+    background: red;
+}

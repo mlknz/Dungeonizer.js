@@ -21,18 +21,22 @@ class Controls {
         this.orbitControls.maxDistance = 1000;
         this.orbitControls.rotateSpeed = 0.25;
 
-        this.orbitControls.enabled = false;
-
         this.walkerControls = new THREE.PointerLockControls(camera, domElement);
         this._controlsObject = this.walkerControls.getObject();
-        this._controlsObject.position.set(0, 0, 0);
-        scene.add(this._controlsObject);
-        // this.walkerControls.enabled = true;
+        this._controlsObject.name = 'pointerLockObject';
+        this.scene.add(this._controlsObject);
 
-        this.navMesh = new THREE.Object3D();
+        this.camera.position.fromArray(config.controls.cameraPos);
+        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+        this.camera.updateProjectionMatrix();
+
+        this.navMesh = new THREE.Group();
+        this._tA = new THREE.Vector3();
+        this._tB = new THREE.Vector3();
+        this._tC = new THREE.Vector3();
 
         const walkerVars = {
-            height: 1.6,
+            height: 2,
             moveForward: false,
             moveLeft: false,
             moveBackward: false,
@@ -43,7 +47,7 @@ class Controls {
             mobileRotateVerticalMult: 1.6,
             velocity: new THREE.Vector3(0, 0, 0),
             raycaster: new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 10),
-            walkingSpeed: 35
+            walkingSpeed: 80
         };
         this.walkerVars = walkerVars;
 
@@ -96,8 +100,8 @@ class Controls {
             if (document.pointerLockElement === element ||
             document.mozPointerLockElement === element ||
             document.webkitPointerLockElement === element) {
-                self.pointerLockControlsEnabled = true;
-                self.walkerControls.enabled = true;
+                // self.pointerLockControlsEnabled = true;
+                // self.walkerControls.enabled = true;
             } else {
                 self.pointerLockControlsEnabled = false;
                 self.walkerControls.enabled = false;
@@ -114,25 +118,149 @@ class Controls {
         };
     }
 
-    update() {
-        this.orbitControls.update();
+    update(delta) {
+        if (this.pointerLockControlsEnabled) {
+            const v = this.walkerVars;
+            const cObj = this._controlsObject;
+
+            let raycastedObj;
+
+            v.raycaster.ray.origin.copy(cObj.position);
+
+            let intersections = [];
+            intersections = v.raycaster.intersectObjects(this.navMesh.children, false);
+
+            const isOnObject = intersections.length > 0;
+
+            v.velocity.x -= v.velocity.x * 10.0 * delta;
+            v.velocity.z -= v.velocity.z * 10.0 * delta;
+
+            if (v.moveForward) v.velocity.z -= v.walkingSpeed * v.moveForwardBackMultiplier * delta;
+            if (v.moveBackward) v.velocity.z += v.walkingSpeed * v.moveForwardBackMultiplier * delta;
+            if (v.moveLeft) v.velocity.x -= v.walkingSpeed * v.moveLeftRightMultiplier * delta;
+            if (v.moveRight) v.velocity.x += v.walkingSpeed * v.moveLeftRightMultiplier * delta;
+
+            if (isOnObject) {
+                raycastedObj = intersections[0];
+                cObj.position.y = intersections[0].point.y + v.height;
+            } else {
+                cObj.position.y -= delta;
+            }
+
+            const prevPos = cObj.position.clone();
+            cObj.translateX(v.velocity.x * delta);
+            cObj.translateZ(v.velocity.z * delta);
+
+            v.raycaster.ray.origin.copy(cObj.position);
+            intersections = [];
+            intersections = v.raycaster.intersectObjects(this.navMesh.children, false);
+
+            const willBeOnObject = intersections.length > 0;
+
+            if (isOnObject && !willBeOnObject) {
+                const newP = cObj.position.clone();
+
+                const posArr = raycastedObj.object.geometry.attributes.position.array;
+                this._tA.fromArray(posArr, raycastedObj.face.a * 3).applyMatrix4(raycastedObj.object.matrixWorld);
+                this._tB.fromArray(posArr, raycastedObj.face.b * 3).applyMatrix4(raycastedObj.object.matrixWorld);
+                this._tC.fromArray(posArr, raycastedObj.face.c * 3).applyMatrix4(raycastedObj.object.matrixWorld);
+
+                const triCenter = new THREE.Vector3(0).add(this._tA).add(this._tB).add(this._tC).divideScalar(3);
+                let intersection = this._linesIntersectsXZ(this._tA, this._tB, prevPos, newP);
+                if (!intersection.intersect) {
+                    intersection = this._linesIntersectsXZ(this._tB, this._tC, prevPos, newP);
+                    if (!intersection.intersect) {
+                        intersection = this._linesIntersectsXZ(this._tA, this._tC, prevPos, newP);
+                    }
+                }
+
+                if (intersection.intersect) {
+                    const A = intersection.A;
+                    const B = intersection.B;
+
+                    const a = new THREE.Vector3().subVectors(B, A);
+
+                    const proj = new THREE.Vector3().subVectors(cObj.position, A).projectOnVector(a);
+
+                    proj.add(A);
+
+                    proj.add(new THREE.Vector3().subVectors(triCenter, proj).divideScalar(1000));
+
+                    proj.add(new THREE.Vector3(0, v.height, 0));
+
+                    cObj.position.copy(proj);
+                } else {
+                    cObj.position.copy(prevPos);
+                }
+
+                // TODO: should work without it (but it doesn't)
+                v.raycaster.ray.origin.copy(cObj.position);
+                intersections = [];
+                intersections = v.raycaster.intersectObjects(this.navMesh.children, false);
+                if (intersections.length < 1) cObj.position.copy(prevPos);
+            }
+        } else {
+            this.orbitControls.update();
+        }
+    }
+
+    _linesIntersectsXZ(A, B, C, D) {
+        const s1 = new THREE.Vector2(B.x - A.x, B.z - A.z);
+        const s2 = new THREE.Vector2(D.x - C.x, D.z - C.z);
+
+        const s = (-s1.y * (A.x - C.x) + s1.x * (A.z - C.z)) / (-s2.x * s1.y + s1.x * s2.y);
+        const t = (s2.x * (A.z - C.z) - s2.y * (A.x - C.x)) / (-s2.x * s1.y + s1.x * s2.y);
+
+        const doIntersect = s >= 0 && s <= 1 && t >= 0 && t <= 1;
+        return {intersect: doIntersect, A, B};
     }
 
     enableWalker(dungeon) {
-        console.log(dungeon);
         this.createNavMesh(dungeon.rooms, dungeon.tunnels);
+        const spawnRoomInd = Math.floor(Math.random() * dungeon.rooms.length);
 
-        this._controlsObject.position.fromArray([20, 20, 20]); // Binding Point
-        this._controlsObject.rotation.y = config.controls.pointerLockEntryYaw; // Rotates Yaw Object
-        this._controlsObject.children[0].rotation.x = config.controls.pointerLockEntryPitch; // Rotates Pitch Object
+        this.camera.position.set(0, 0, 0);
+        this.camera.rotation.set(0, 0, 0);
+
+        this._controlsObject.position.fromArray([dungeon.rooms[spawnRoomInd].x, 10, dungeon.rooms[spawnRoomInd].y]); // Binding Point
+        this._controlsObject.rotation.y = 0; // Rotates Yaw Object
+        this._controlsObject.children[0].rotation.x = 0; // Rotates Pitch Object
 
         this._addKeyboardListeners();
         this._preparePointerLock();
+        this.orbitControls.enabled = false;
         this.pointerLockControlsEnabled = true;
+        this.walkerControls.enabled = true;
     }
 
+    // scale manipulation in purpose of not letting camera to get into walls. L-shapes case though
     createNavMesh(rooms, tunnels) {
+        const navMesh = this.navMesh;
+        const cubeGeom = new THREE.BoxBufferGeometry(1, 1, 1);
+        let tunnel, isHorizontal, x, y, xS, yS;
 
+        for (let i = 0; i < rooms.length; i++) {
+            const room = new THREE.Mesh(cubeGeom);
+            room.scale.set(rooms[i].w - 0.1, config.visParams.floorHeight, rooms[i].h - 0.1);
+            room.position.set(rooms[i].x, 0, rooms[i].y);
+            navMesh.add(room);
+        }
+
+        for (let i = 0; i < tunnels.length; i += 4) {
+            tunnel = new THREE.Mesh(cubeGeom);
+            isHorizontal = tunnels[i + 2] - tunnels[i] > tunnels[i + 3] - tunnels[i + 1];
+            x = isHorizontal ? (tunnels[i] + tunnels[i + 2]) / 2 : (tunnels[i] + 0.5);
+            xS = isHorizontal ? tunnels[i + 2] - tunnels[i] + 0.1 : 1 - 0.1;
+
+            y = isHorizontal ? (tunnels[i + 1] + 0.5) : (tunnels[i + 1] + tunnels[i + 3]) / 2;
+            yS = isHorizontal ? 1 - 0.1 : tunnels[i + 3] - tunnels[i + 1] + 0.1;
+
+            tunnel.scale.set(xS, config.visParams.tunnelHeight, yS);
+            tunnel.position.set(x, 0, y);
+            navMesh.add(tunnel);
+        }
+
+        navMesh.updateMatrixWorld(true);
     }
 
     _addKeyboardListeners() {
@@ -147,7 +275,6 @@ class Controls {
 
     clearNavMesh() {
         for (let i = this.navMesh.children.length - 1; i >= 0; i--) {
-            this.navMesh.children[i].material.dispose();
             this.navMesh.children[i].geometry.dispose();
             this.navMesh.remove(this.navMesh.children[i]);
         }
@@ -161,6 +288,7 @@ class Controls {
         this._removeKeyboardListeners();
         this._removePointerLock();
         this.pointerLockControlsEnabled = false;
+        this.orbitControls.enabled = true;
 
         this._controlsObject.position.set(0, 0, 0); // Resets Binding Point offset
         this._controlsObject.rotation.y = 0; // Resets Yaw Object
@@ -208,6 +336,7 @@ class Controls {
 
     dispose() {
         this.orbitControls.dispose();
+        this.walkerControls.dispose();
     }
 }
 
