@@ -1,5 +1,8 @@
 
 const config = {
+    global: {
+        repoUrl: 'https://github.com/mlknz/Dungeonizer.js'
+    },
     generationMode: {
         withWalls: true,
         isDebug: false
@@ -14,6 +17,11 @@ const config = {
         density: 0.6,
         fromDungeonId: false,
         dungeonId: ''
+    },
+    controls: {
+        cameraPos: [-90, 110, 50],
+        pointerLockEntryYaw: -1.5, // <===>
+        pointerLockEntryPitch: -0.3 // ^ v
     },
     visParams: {
         floorHeight: 1,

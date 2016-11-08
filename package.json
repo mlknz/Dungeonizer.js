@@ -17,6 +17,7 @@
     "babel-preset-es2015": "^6.3.13",
     "browser-sync": "^2.11.1",
     "del": "^2.2.0",
+    "device.js": "^0.1.2",
     "eslint": "^1.10.3",
     "eslint-config-airbnb": "^4.0.0",
     "eslint-loader": "^1.2.1",

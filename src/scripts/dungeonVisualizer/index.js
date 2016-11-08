@@ -16,13 +16,13 @@ class DungeonVisualizer {
         const aspectRatio = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
         this.camera = new THREE.PerspectiveCamera(60, aspectRatio, 0.1, 2000);
-        this.camera.position.set(-90, 110, 50);
+        this.camera.position.fromArray(config.controls.cameraPos);
         this.camera.lookAt(new THREE.Vector3(0, 0, 0));
         this.camera.updateProjectionMatrix();
 
-        this.controls = new Controls(this.camera, this.renderer.domElement);
-
         this.scene = new THREE.Scene();
+
+        this.controls = new Controls(this.camera, this.renderer.domElement, this.scene);
 
         const light = new THREE.AmbientLight(0x202020);
         this.scene.add(light);
