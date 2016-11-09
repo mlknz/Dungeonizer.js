@@ -18,8 +18,12 @@ const config = {
         fromDungeonId: false,
         dungeonId: ''
     },
-    controls: {
-        cameraPos: [-90, 110, 50]
+    camera: {
+        cameraPos: [-90, 110, 50],
+        near: 1,
+        far: 1400,
+        walkerNear: 0.005,
+        walkerFar: 100
     },
     visParams: {
         floorHeight: 1,

@@ -2,8 +2,6 @@ import config from './config.js';
 
 const device = require('device.js')();
 
-// todo: add link to source
-// todo: close dat.gui on mobiles (and more flixible dat.gui size)
 class AppUi {
     constructor(dungeonVisualizer) {
         this.dungeonVisualizer = dungeonVisualizer;

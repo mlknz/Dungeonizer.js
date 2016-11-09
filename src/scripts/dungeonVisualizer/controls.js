@@ -26,7 +26,7 @@ class Controls {
         this._controlsObject.name = 'pointerLockObject';
         this.scene.add(this._controlsObject);
 
-        this.camera.position.fromArray(config.controls.cameraPos);
+        this.camera.position.fromArray(config.camera.cameraPos);
         this.camera.lookAt(new THREE.Vector3(0, 0, 0));
         this.camera.updateProjectionMatrix();
 
@@ -36,18 +36,24 @@ class Controls {
         this._tC = new THREE.Vector3();
 
         const walkerVars = {
-            height: 2,
+            height: 1.6,
             moveForward: false,
             moveLeft: false,
             moveBackward: false,
             moveRight: false,
+            speedModifier: 1,
+            shiftSpeedModifier: 2,
+            jump: false,
+            isJumping: false,
             moveForwardBackMultiplier: 1,
-            moveLeftRightMultiplier: 1,
+            moveLeftRightMultiplier: 0.9,
             mobileRotateHorizontalMult: 2,
             mobileRotateVerticalMult: 1.6,
             velocity: new THREE.Vector3(0, 0, 0),
             raycaster: new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 10),
-            walkingSpeed: 80
+            walkingSpeed: 65,
+            jumpStrength: 8,
+            gravity: 30
         };
         this.walkerVars = walkerVars;
 
@@ -68,6 +74,12 @@ class Controls {
             case 39: // right
             case 68: // d
                 walkerVars.moveRight = true;
+                break;
+            case 16: // shift
+                walkerVars.speedModifier = walkerVars.shiftSpeedModifier;
+                break;
+            case 32: // space
+                walkerVars.jump = true;
                 break;
             default:
             }
@@ -90,6 +102,12 @@ class Controls {
             case 39: // right
             case 68: // d
                 walkerVars.moveRight = false;
+                break;
+            case 16: // shift
+                walkerVars.speedModifier = 1;
+                break;
+            case 32: // space
+                walkerVars.jump = false;
                 break;
             default:
             }
@@ -134,18 +152,27 @@ class Controls {
 
             v.velocity.x -= v.velocity.x * 10.0 * delta;
             v.velocity.z -= v.velocity.z * 10.0 * delta;
+            v.velocity.y -= v.gravity * delta;
 
-            if (v.moveForward) v.velocity.z -= v.walkingSpeed * v.moveForwardBackMultiplier * delta;
-            if (v.moveBackward) v.velocity.z += v.walkingSpeed * v.moveForwardBackMultiplier * delta;
-            if (v.moveLeft) v.velocity.x -= v.walkingSpeed * v.moveLeftRightMultiplier * delta;
-            if (v.moveRight) v.velocity.x += v.walkingSpeed * v.moveLeftRightMultiplier * delta;
+            if (v.moveForward) v.velocity.z -= v.walkingSpeed * v.speedModifier * v.moveForwardBackMultiplier * delta;
+            if (v.moveBackward) v.velocity.z += v.walkingSpeed * v.speedModifier * v.moveForwardBackMultiplier * delta;
+            if (v.moveLeft) v.velocity.x -= v.walkingSpeed * v.speedModifier * v.moveLeftRightMultiplier * delta;
+            if (v.moveRight) v.velocity.x += v.walkingSpeed * v.speedModifier * v.moveLeftRightMultiplier * delta;
+            if (v.jump && !v.isJumping) {
+                v.velocity.y = v.jumpStrength;
+                v.isJumping = true;
+            }
 
             if (isOnObject) {
                 raycastedObj = intersections[0];
-                cObj.position.y = intersections[0].point.y + v.height;
-            } else {
-                cObj.position.y -= delta;
+                if (raycastedObj.distance < v.height) {
+                    cObj.position.y = intersections[0].point.y + v.height;
+                    v.velocity.y = 0;
+                    v.isJumping = false;
+                }
             }
+
+            cObj.translateY(v.velocity.y * delta);
 
             const prevPos = cObj.position.clone();
             cObj.translateX(v.velocity.x * delta);
@@ -186,7 +213,7 @@ class Controls {
 
                     proj.add(new THREE.Vector3().subVectors(triCenter, proj).divideScalar(1000));
 
-                    proj.add(new THREE.Vector3(0, v.height, 0));
+                    proj.y = prevPos.y;
 
                     cObj.position.copy(proj);
                 } else {
@@ -221,8 +248,11 @@ class Controls {
 
         this.camera.position.set(0, 0, 0);
         this.camera.rotation.set(0, 0, 0);
+        this.camera.near = config.camera.walkerNear;
+        this.camera.far = config.camera.walkerFar;
+        this.camera.updateProjectionMatrix();
 
-        this._controlsObject.position.fromArray([dungeon.rooms[spawnRoomInd].x, 10, dungeon.rooms[spawnRoomInd].y]); // Binding Point
+        this._controlsObject.position.fromArray([dungeon.rooms[spawnRoomInd].x, 6, dungeon.rooms[spawnRoomInd].y]); // Binding Point
         this._controlsObject.rotation.y = 0; // Rotates Yaw Object
         this._controlsObject.children[0].rotation.x = 0; // Rotates Pitch Object
 
@@ -241,7 +271,7 @@ class Controls {
 
         for (let i = 0; i < rooms.length; i++) {
             const room = new THREE.Mesh(cubeGeom);
-            room.scale.set(rooms[i].w - 0.1, config.visParams.floorHeight, rooms[i].h - 0.1);
+            room.scale.set(rooms[i].w - 0.04, config.visParams.floorHeight, rooms[i].h - 0.04);
             room.position.set(rooms[i].x, 0, rooms[i].y);
             navMesh.add(room);
         }
@@ -250,10 +280,10 @@ class Controls {
             tunnel = new THREE.Mesh(cubeGeom);
             isHorizontal = tunnels[i + 2] - tunnels[i] > tunnels[i + 3] - tunnels[i + 1];
             x = isHorizontal ? (tunnels[i] + tunnels[i + 2]) / 2 : (tunnels[i] + 0.5);
-            xS = isHorizontal ? tunnels[i + 2] - tunnels[i] + 0.1 : 1 - 0.1;
+            xS = isHorizontal ? tunnels[i + 2] - tunnels[i] - 0.04 : 1 - 0.04;
 
             y = isHorizontal ? (tunnels[i + 1] + 0.5) : (tunnels[i + 1] + tunnels[i + 3]) / 2;
-            yS = isHorizontal ? 1 - 0.1 : tunnels[i + 3] - tunnels[i + 1] + 0.1;
+            yS = isHorizontal ? 1 - 0.04 : tunnels[i + 3] - tunnels[i + 1] - 0.04;
 
             tunnel.scale.set(xS, config.visParams.tunnelHeight, yS);
             tunnel.position.set(x, 0, y);
@@ -281,8 +311,10 @@ class Controls {
     }
 
     disableWalker() {
-        this.camera.position.fromArray(config.controls.cameraPos);
+        this.camera.position.fromArray(config.camera.cameraPos);
         this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+        this.camera.near = config.camera.near;
+        this.camera.far = config.camera.far;
         this.camera.updateProjectionMatrix();
 
         this._removeKeyboardListeners();
