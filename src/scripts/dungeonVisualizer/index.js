@@ -9,23 +9,17 @@ import config from '../config.js';
 class DungeonVisualizer {
     constructor(renderer) {
         this.renderer = renderer;
-        this.renderer.setClearColor(0x111111, false);
+        this.renderer.setClearColor(0x000000, false);
         this.renderer.setPixelRatio(window.devicePixelRatio || 1);
 
         const gl = this.renderer.getContext();
         const aspectRatio = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
-        this.camera = new THREE.PerspectiveCamera(60, aspectRatio, config.camera.near, config.camera.far);
-        this.camera.position.fromArray(config.camera.cameraPos);
-        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
-        this.camera.updateProjectionMatrix();
-
         this.scene = new THREE.Scene();
 
+        this.camera = new THREE.PerspectiveCamera(60, aspectRatio, config.camera.near, config.camera.far);
         this.controls = new Controls(this.camera, this.renderer.domElement, this.scene);
-
-        const light = new THREE.AmbientLight(0x202020);
-        this.scene.add(light);
+        this.controls.resetCameraOrbit();
 
         const dirLight = new THREE.DirectionalLight(0x707070);
         dirLight.position.set(10, 20, 10);
