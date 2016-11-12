@@ -4,6 +4,7 @@ require('three/examples/js/controls/OrbitControls.js');
 require('three/examples/js/controls/PointerLockControls');
 
 const nipplejs = require('nipplejs');
+const device = require('device.js')();
 
 import config from '../config.js';
 
@@ -95,13 +96,24 @@ class Controls {
         this.camera = camera;
         this.domElement = domElement;
         this.walkerEnabled = false;
-        this.isDesktop = true;
+        this.isDesktop = device.desktop();
 
         this.orbitControls = new THREE.OrbitControls(camera, domElement);
         this.orbitControls.enableDamping = true;
         this.orbitControls.minDistance = 1;
         this.orbitControls.maxDistance = 1000;
         this.orbitControls.rotateSpeed = 0.25;
+
+        this.infoEl = document.createElement('div');
+        this.infoEl.className = 'buttonsRoot';
+        this.infoEl.style.background = 'rgba(255,255,255,0.4)';
+        if (!this.isDesktop) {
+            this.infoEl.style.width = '70%';
+            this.infoEl.style.right = '0';
+            this.infoEl.innerHTML = 'Controls: touch joystick to move, touch out of joystick to look around.';
+        } else {
+            this.infoEl.innerHTML = 'Controls: WASD / Space / Shift + mouse. Press Escape to exit.';
+        }
 
         this.walkerControls = new THREE.PointerLockControls(camera, domElement);
         this._controlsObject = this.walkerControls.getObject();
@@ -118,8 +130,7 @@ class Controls {
         this.navMesh = new THREE.Group();
     }
 
-    enableWalker(dungeon, isDesktop) {
-        this.isDesktop = isDesktop;
+    enableWalker(dungeon) {
         this.createNavMesh(dungeon.rooms, dungeon.tunnels);
         const spawnRoomInd = Math.floor(Math.random() * dungeon.rooms.length);
 
@@ -140,6 +151,8 @@ class Controls {
             document.body.appendChild(this._lookJoystickCont);
         }
 
+        document.body.appendChild(this.infoEl);
+
         this.orbitControls.enabled = false;
         this.walkerControls.enabled = true;
     }
@@ -154,6 +167,8 @@ class Controls {
             document.body.removeChild(this._moveJoystickCont);
             document.body.removeChild(this._lookJoystickCont);
         }
+
+        document.body.removeChild(this.infoEl);
 
         this.orbitControls.enabled = true;
         this.walkerControls.enabled = false;
@@ -369,13 +384,14 @@ class Controls {
         // document.body.removeChild(moveJoystickCont);
 
         // todo: remove this joystick and handle look rotation manually
+        // todo: joystick styles (mobile device orientation)
         const lookJoystickCont = document.createElement('div.lookJoystickCont');
         lookJoystickCont.style.height = '90%';
         lookJoystickCont.style.position = 'absolute';
         lookJoystickCont.style.width = '100%';
         lookJoystickCont.style.bottom = '0';
         lookJoystickCont.style.right = '0';
-        // document.body.appendChild(lookJoystickCont);
+
         lookJoystickCont.style.zIndex = 0;
         const lookNippleManager = nipplejs.create({
             zone: lookJoystickCont,

@@ -41,7 +41,7 @@ class AppUi {
 
         gui.add(redirect, 'jumpToSource').name('Go to Source Code');
 
-        if (!device.desktop()) gui.close();
+        if (!this.isDesktop) gui.close();
 
         const generateButton = document.getElementById('generateButton');
         generateButton.addEventListener('click', () => {this.resetDungeon();});
@@ -57,7 +57,7 @@ class AppUi {
         document.addEventListener('disableWalker', () => {
             this.buttonsRoot.style.display = '';
             this.mobileExitButton.style.display = 'none';
-            if (device.desktop()) gui.open();
+            if (this.isDesktop) gui.open();
         });
     }
 
@@ -101,7 +101,7 @@ class AppUi {
     }
 
     enableWalker() {
-        this.dungeonVisualizer.controls.enableWalker(this.dungeon, this.isDesktop);
+        this.dungeonVisualizer.controls.enableWalker(this.dungeon);
         if (!this.isDesktop) {
             this.mobileExitButton.style.display = 'table';
         }
