@@ -13,7 +13,7 @@ class AppUi {
         this.buttonsContainer = document.getElementById('buttonsRoot');
         this.mobileExitButton = document.getElementById('exitWalkerMobile');
 
-        const gui = new dat.GUI({width: this.isDesktop ? 400 : 300}); // eslint-disable-line
+        const gui = new dat.GUI({width: 300}); // eslint-disable-line
         this.gui = gui;
         gui.add(this.dungeonParams, 'dungeonSize').min(1).max(100).step(1).name('Dungeon Size');
 
