@@ -3,6 +3,7 @@
 Dungeon generation + visualization in javascript / webgl.  
 [Live version here.](https://mlknz.github.io/Dungeonizer.js/)
 
+![alt tag](https://cloud.githubusercontent.com/assets/12106426/20242290/7e4718ba-a93a-11e6-95db-c66f7b64eb7e.gif)
 
 The general idea is borrowed from [this blog article on gamasutra](http://www.gamasutra.com/blogs/AAdonaac/20150903/252889/Procedural_Dungeon_Generation_Algorithm.php).
 
