@@ -9,7 +9,9 @@ class AppUi {
 
         this.dungeonParams = config.dungeonParams;
         this.isDesktop = device.desktop();
+
         this.buttonsContainer = document.getElementById('buttonsRoot');
+        this.mobileExitButton = document.getElementById('exitWalkerMobile');
 
         const gui = new dat.GUI({width: this.isDesktop ? 400 : 300}); // eslint-disable-line
         this.gui = gui;
@@ -47,11 +49,15 @@ class AppUi {
         const walkerButton = document.getElementById('walkerButton');
         walkerButton.addEventListener('click', () => {this.enableWalker();});
 
+        this.mobileExitButton.addEventListener('click', () => {
+            this.dungeonVisualizer.controls.disableWalker();
+        });
+
         this.buttonsRoot = document.getElementById('buttonsRoot');
         document.addEventListener('disableWalker', () => {
-            if (device.desktop()) gui.open();
             this.buttonsRoot.style.display = '';
-
+            this.mobileExitButton.style.display = 'none';
+            if (device.desktop()) gui.open();
         });
     }
 
@@ -95,7 +101,10 @@ class AppUi {
     }
 
     enableWalker() {
-        this.dungeonVisualizer.controls.enableWalker(this.dungeon);
+        this.dungeonVisualizer.controls.enableWalker(this.dungeon, this.isDesktop);
+        if (!this.isDesktop) {
+            this.mobileExitButton.style.display = 'table';
+        }
         this.gui.close();
         this.buttonsRoot.style.display = 'none';
     }

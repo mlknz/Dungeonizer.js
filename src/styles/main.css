@@ -10,13 +10,43 @@ body {
     background: linear-gradient(45deg, #282222 0%, #000000 100%);
     position: absolute;
 }
+
+.exitWalkerMobile {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20%;
+    height: 10%;
+
+    background: #eeeeee;
+    font-size: 4vh;
+    font-weight: bold;
+    display: none;
+
+    -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+   -khtml-user-select: none; /* Konqueror */
+     -moz-user-select: none; /* Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none; /* Non-prefixed version, currently
+                                not supported by any browser */
+}
+.exitWalkerMobileButton {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    line-height: 100%;
+}
+
 .buttonsRoot {
     position: absolute;
     bottom: 0;
     right: 35%;
     width: 30%;
     height: 12%;
-    font-size: 20px;
 
     background: #884444;
     font-size: 4vh;

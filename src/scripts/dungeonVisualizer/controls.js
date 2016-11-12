@@ -3,6 +3,8 @@ window.THREE = THREE;
 require('three/examples/js/controls/OrbitControls.js');
 require('three/examples/js/controls/PointerLockControls');
 
+const nipplejs = require('nipplejs');
+
 import config from '../config.js';
 
 const disableWalkerEvent = new Event('disableWalker');
@@ -93,6 +95,7 @@ class Controls {
         this.camera = camera;
         this.domElement = domElement;
         this.walkerEnabled = false;
+        this.isDesktop = true;
 
         this.orbitControls = new THREE.OrbitControls(camera, domElement);
         this.orbitControls.enableDamping = true;
@@ -105,12 +108,18 @@ class Controls {
         this._controlsObject.name = 'pointerLockObject';
         scene.add(this._controlsObject);
 
+        this._movTouchCos = 0;
+        this._movTouchSin = 0;
+        this._mobileLookLeftRight = 0;
+        this._mobileLookUpDown = 0;
+
         this.resetCameraOrbit();
 
         this.navMesh = new THREE.Group();
     }
 
-    enableWalker(dungeon) {
+    enableWalker(dungeon, isDesktop) {
+        this.isDesktop = isDesktop;
         this.createNavMesh(dungeon.rooms, dungeon.tunnels);
         const spawnRoomInd = Math.floor(Math.random() * dungeon.rooms.length);
 
@@ -120,8 +129,16 @@ class Controls {
         this._controlsObject.rotation.y = 0; // Rotates Yaw Object
         this._controlsObject.children[0].rotation.x = 0; // Rotates Pitch Object
 
-        this._addKeyboardListeners();
-        this._preparePointerLock();
+        if (this.isDesktop) {
+            this._addKeyboardListeners();
+            this._preparePointerLock();
+        } else {
+            if (!this._moveJoystickCont) {
+                this._initTouchJoystick();
+            }
+            document.body.appendChild(this._moveJoystickCont);
+            document.body.appendChild(this._lookJoystickCont);
+        }
 
         this.orbitControls.enabled = false;
         this.walkerControls.enabled = true;
@@ -130,8 +147,13 @@ class Controls {
     disableWalker() {
         this.resetCameraOrbit();
 
-        this._removeKeyboardListeners();
-        this._removePointerLock();
+        if (this.isDesktop) {
+            this._removeKeyboardListeners();
+            this._removePointerLock();
+        } else {
+            document.body.removeChild(this._moveJoystickCont);
+            document.body.removeChild(this._lookJoystickCont);
+        }
 
         this.orbitControls.enabled = true;
         this.walkerControls.enabled = false;
@@ -165,6 +187,14 @@ class Controls {
             this.orbitControls.update();
         } else {
             const cObj = this._controlsObject;
+
+            if (!this.isDesktop) {
+                cObj.rotation.y -= this._mobileLookLeftRight * v.mobileRotateHorizontalMult * delta;
+                cObj.children[0].rotation.x += this._mobileLookUpDown * v.mobileRotateVerticalMult * delta;
+                cObj.children[0].rotation.x = Math.min(Math.max(
+                    cObj.children[0].rotation.x, -Math.PI / 2
+                ), Math.PI / 2);
+            }
 
             let raycastedObj;
 
@@ -245,7 +275,7 @@ class Controls {
                     cObj.position.copy(prevPos);
                 }
 
-                // TODO: should work without it (but it doesn't)
+                // TODO: should work without it (but it doesn't... yet)
                 v.raycaster.ray.origin.copy(cObj.position);
                 intersections = [];
                 intersections = v.raycaster.intersectObjects(this.navMesh.children, false);
@@ -300,6 +330,79 @@ class Controls {
             this.navMesh.children[i].geometry.dispose();
             this.navMesh.remove(this.navMesh.children[i]);
         }
+    }
+
+    _initTouchJoystick() {
+        const moveJoystickCont = document.createElement('div.moveJoystickCont');
+        document.body.appendChild(moveJoystickCont);
+
+        const moveNippleManager = nipplejs.create({
+            zone: moveJoystickCont,
+            mode: 'static',
+            position: {left: this.domElement.width * 0.08 + 'px', bottom: this.domElement.width * 0.08 + 'px'},
+            size: this.domElement.width * 0.13,
+            color: '#000000'
+        });
+        this._movementJoystick = moveNippleManager[0];
+
+        this._movementJoystick.on('move', (evt, data) => {
+            this._movTouchCos = Math.cos(data.angle.radian);
+            this._movTouchSin = Math.sin(data.angle.radian);
+
+            v.moveForward = this._movTouchSin > 0;
+            v.moveBackward = !v.moveForward;
+            v.moveRight = this._movTouchCos > 0;
+            v.moveLeft = !v.moveBackward;
+
+            v.moveForwardBackMultiplier = Math.abs(this._movTouchSin) * Math.min(data.force, 2.5);
+            v.moveLeftRightMultiplier = Math.abs(this._movTouchCos) * Math.min(data.force, 2.5);
+        });
+
+        this._movementJoystick.on('end', () => {
+            v.moveForward = false;
+            v.moveBackward = false;
+            v.moveRight = false;
+            v.moveLeft = false;
+        });
+
+        this._moveJoystickCont = moveJoystickCont;
+        // document.body.removeChild(moveJoystickCont);
+
+        // todo: remove this joystick and handle look rotation manually
+        const lookJoystickCont = document.createElement('div.lookJoystickCont');
+        lookJoystickCont.style.height = '90%';
+        lookJoystickCont.style.position = 'absolute';
+        lookJoystickCont.style.width = '100%';
+        lookJoystickCont.style.bottom = '0';
+        lookJoystickCont.style.right = '0';
+        // document.body.appendChild(lookJoystickCont);
+        lookJoystickCont.style.zIndex = 0;
+        const lookNippleManager = nipplejs.create({
+            zone: lookJoystickCont,
+            mode: 'dynamic',
+            size: this.domElement.width * 0.13,
+            position: {right: this.domElement.width * 0.08 + 'px', bottom: this.domElement.width * 0.08 + 'px'},
+            maxNumberOfNipples: 1,
+            multitouch: false,
+            dataOnly: true
+            // el: lookJoystickCont,
+            // color: 'red'
+        });
+
+        lookNippleManager.on('added', (evt, nipple) => {
+            nipple.on('move', (e, data) => {
+                this._mobileLookLeftRight = Math.cos(data.angle.radian) * Math.min(data.force, 2.5);
+                this._mobileLookUpDown = Math.sin(data.angle.radian) * Math.min(data.force, 2.5);
+            });
+            nipple.on('end', () => {
+                this._mobileLookLeftRight = 0;
+                this._mobileLookUpDown = 0;
+            });
+        }).on('removed', (e, nipple) => {
+            nipple.off('start move dir plain end');
+        });
+
+        this._lookJoystickCont = lookJoystickCont;
     }
 
     _pointerlockchange() {

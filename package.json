@@ -9,7 +9,7 @@
   },
   "engines": {
     "node": ">=5.0.0"
-},
+  },
   "devDependencies": {
     "babel-core": "^6.4.5",
     "babel-eslint": "^4.1.6",
@@ -26,6 +26,7 @@
     "gulp-util": "^3.0.7",
     "ip": "^1.1.0",
     "json-loader": "^0.5.4",
+    "nipplejs": "^0.6.7",
     "portfinder": "^0.4.0",
     "seedrandom": "^2.4.2",
     "three": "0.80.0",
