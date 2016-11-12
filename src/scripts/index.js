@@ -36,15 +36,19 @@ class App {
         const gl = renderer.getContext();
         const devicePixelRatio = window.devicePixelRatio || 1;
         function resize() {
-            const width = canvas.clientWidth;
-            const height = canvas.clientHeight;
+            const width = Math.floor(canvas.clientWidth * devicePixelRatio);
+            const height = Math.floor(canvas.clientHeight * devicePixelRatio);
+
             if (canvas.width !== width || canvas.height !== height) {
-                canvas.width = width * devicePixelRatio;
-                canvas.height = height * devicePixelRatio;
+                appUi.resize(width, height);
+
+                canvas.width = width;
+                canvas.height = height;
 
                 dungeonVisualizer.resize(width, height);
-                gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
             }
+            gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
         }
 
         const clock = new THREE.Clock();

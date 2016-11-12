@@ -51,7 +51,7 @@ class Rooms {
           const roomsAmount = this.roomsAmount;
           const maxRoomSize = this.maxRoomSize;
 
-          const radialStep = Math.max(1 - this.density, 0) * maxRoomSize;
+          const radialStep = 0.1 + Math.max(1 - this.density, 0) * maxRoomSize * 0.9;
           const maxR = roomsAmount * maxRoomSize * 2;
 
           for (let i = 1; i < roomsAmount; i++) {

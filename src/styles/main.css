@@ -15,10 +15,10 @@ body {
     bottom: 0;
     right: 35%;
     width: 30%;
-    height: 15%;
+    height: 12%;
     font-size: 20px;
 
-    background: red;
+    background: #884444;
     font-size: 4vh;
     font-weight: bold;
     display: table;
@@ -31,35 +31,51 @@ body {
           user-select: none; /* Non-prefixed version, currently
                                 not supported by any browser */
 }
-.walkerButton {
-    width: 49%;
-    height: 100%;
-    background: white;
-    top: 0;
-    cursor: pointer;
-    text-align: center;
-    display: table-cell;
-    vertical-align: middle;
-    line-height: 100%;
-}
 
-.generateButton {
+.walkerButton, .generateButton {
     width: 49%;
     height: 100%;
-    text-align: center;
+    background: #eeeeee;
     cursor: pointer;
+    text-align: center;
     display: table-cell;
-    background: white;
     vertical-align: middle;
     line-height: 100%;
 }
 
 .walkerButton:hover, .generateButton:hover{
-    background: blue;
+    background: #aa8888;
 }
 
 .dummy {
     width: 2%;
     height: 100%;
     background: red;
+}
+
+.dg .c .slider-fg {
+    background: #888888;
+}
+.dg .c .slider:hover .slider-fg {
+    background: #cccccc;
+}
+
+.dg .cr.string input[type=text] {
+    color: #bbbbbb;
+}
+.dg .cr.number input[type=text] {
+    color: #bbbbbb;
+}
+
+.dg .cr.function {
+    border-left: 3px solid #777777;
+}
+.dg .cr.string {
+    border-left: 3px solid #bbbbbb;
+}
+.dg .cr.boolean {
+    border-left: 3px solid #eeeeee;
+}
+.dg .cr.number {
+    border-left: 3px solid #999999;
 }

@@ -8,10 +8,12 @@ class AppUi {
         this.dungeon = null;
 
         this.dungeonParams = config.dungeonParams;
+        this.isDesktop = device.desktop();
+        this.buttonsContainer = document.getElementById('buttonsRoot');
 
-        const gui = new dat.GUI({width: device.desktop() ? 400 : 300}); // eslint-disable-line
+        const gui = new dat.GUI({width: this.isDesktop ? 400 : 300}); // eslint-disable-line
         this.gui = gui;
-        gui.add(this.dungeonParams, 'dungeonSize').min(1).max(120).step(1).name('Dungeon Size');
+        gui.add(this.dungeonParams, 'dungeonSize').min(1).max(100).step(1).name('Dungeon Size');
 
         const roomsFolder = gui.addFolder('Rooms');
         roomsFolder.add(this.dungeonParams, 'roomSizeDistribution', { normal: 'normal', uniform: 'uniform' });
@@ -51,6 +53,18 @@ class AppUi {
             this.buttonsRoot.style.display = '';
 
         });
+    }
+
+    resize(w, h) {
+        if (!this.isDesktop && this.buttonsContainer) {
+            if (w > h) {
+                this.buttonsContainer.style.width = '50%';
+                this.buttonsContainer.style.right = '25%';
+            } else {
+                this.buttonsContainer.style.width = '100%';
+                this.buttonsContainer.style.right = '0';
+            }
+        }
     }
 
     generateNewDungeonId() {
