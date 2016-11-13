@@ -45,9 +45,9 @@ class Tunnels {
         const overlapX = (roomA.w + roomB.w) / 2 - Math.abs(dx);
         const overlapY = (roomA.h + roomB.h) / 2 - Math.abs(dy);
 
-        const rightRoom = dx > 0 ? roomA : roomB;
+        const rightRoom = dx >= 0 ? roomA : roomB;
         const leftRoom = dx > 0 ? roomB : roomA;
-        const upRoom = dy > 0 ? roomA : roomB;
+        const upRoom = dy >= 0 ? roomA : roomB;
         const downRoom = dy > 0 ? roomB : roomA;
 
         if (overlapX > 0) {
