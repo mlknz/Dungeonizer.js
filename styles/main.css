@@ -16,7 +16,7 @@ body {
 
     font-size: 4vh;
     font-weight: bold;
-    
+
     -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Chrome/Safari/Opera */
    -khtml-user-select: none; /* Konqueror */
@@ -28,7 +28,7 @@ body {
 
 .exitWalkerMobile {
     left: 0;
-    top: 0;
+    top: 10%;
     width: 20%;
     height: 10%;
     display: none;
