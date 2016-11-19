@@ -93,13 +93,13 @@ class WalkerTouchControls {
     }
 
     resetJoystickDiv() {
-        this._front.style.marginLeft = this._back.clientWidth / 2 - this._front.clientWidth / 2 + 'px';
-        this._front.style.marginTop = this._back.clientHeight / 2 - this._front.clientHeight / 2 + 'px';
+        this._front.style.marginLeft = this._back.clientWidth / 2 - this._front.clientWidth / 2 - 1 + 'px';
+        this._front.style.marginTop = this._back.clientHeight / 2 - this._front.clientHeight / 2 - 1 + 'px';
     }
 
     _smoothResetJoystickDiv() {
-        desiredLeft = this._back.clientWidth / 2 - this._front.clientWidth / 2;
-        desiredTop = this._back.clientHeight / 2 - this._front.clientHeight / 2;
+        desiredLeft = this._back.clientWidth / 2 - this._front.clientWidth / 2 - 1;
+        desiredTop = this._back.clientHeight / 2 - this._front.clientHeight / 2 - 1;
 
         currentLeft = this._front.offsetLeft;
         currentTop = this._front.offsetTop;
@@ -207,7 +207,7 @@ class WalkerTouchControls {
 
         front.style.width = '50%';
         front.style.height = '50%';
-        front.style.display = 'table';
+        front.style.display = 'block';
         front.style.backgroundColor = '#000000';
         front.style.borderRadius = '50%';
         front.style.borderStyle = 'dashed';
