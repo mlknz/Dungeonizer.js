@@ -21,7 +21,6 @@ THREE.PointerLockControls = function(camera, domElement, isDesktop) {
     const onMouseMove = function(event) {
 
         if (scope.enabled === false) return;
-        event.preventDefault();
 
         const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
         const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
@@ -52,12 +51,14 @@ THREE.PointerLockControls = function(camera, domElement, isDesktop) {
     };
 
     this.dispose = function() {
+        // this.domElement.removeEventListener('mousemove', onMouseMove, false);
         document.removeEventListener('mousemove', onMouseMove, false);
-        if (isDesktop) document.removeEventListener('touchmove', onTouchMove, false);
+        if (isDesktop) this.domElement.removeEventListener('touchmove', onTouchMove, false);
     };
 
+    // this.domElement.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('mousemove', onMouseMove, false);
-    if (isDesktop) document.addEventListener('touchmove', onTouchMove, false);
+    if (isDesktop) this.domElement.addEventListener('touchmove', onTouchMove, false);
 
     this.enabled = false;
     this.touchId = null;
