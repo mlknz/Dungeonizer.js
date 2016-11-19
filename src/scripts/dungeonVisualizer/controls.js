@@ -1,14 +1,22 @@
 window.THREE = THREE;
 
 require('three/examples/js/controls/OrbitControls.js');
-require('three/examples/js/controls/PointerLockControls');
+// require('three/examples/js/controls/PointerLockControls');
+require('./PointerLockControls.js'); // with touchmove support for trackpad / touchpad
 
 const device = require('device.js')();
 
 import config from '../config.js';
 import WalkerTouchControls from './walkerTouchControls.js';
 
-const disableWalkerEvent = new Event('disableWalker');
+
+let disableWalkerEvent;
+try {
+    disableWalkerEvent = new Event('disableWalker');
+} catch (e) {
+    disableWalkerEvent = document.createEvent('Event');
+    disableWalkerEvent.initEvent('disableWalker', true, true);
+}
 
 let self;
 const v = {
@@ -127,7 +135,7 @@ class Controls {
             this.infoEl.innerHTML = 'Controls: WASD / Space / Shift + mouse. Press Escape to exit.';
         }
 
-        this.walkerControls = new THREE.PointerLockControls(camera, domElement);
+        this.walkerControls = new THREE.PointerLockControls(camera, domElement, this.isDesktop);
         this._controlsObject = this.walkerControls.getObject();
         this._controlsObject.name = 'pointerLockObject';
         scene.add(this._controlsObject);
@@ -155,7 +163,7 @@ class Controls {
             this._addKeyboardListeners();
             if (!this._preparePointerLock()) { // safari couldn't lock the pointer
                 this.rotateOnMouseDown = true;
-                this._rotateOnMouseDownEnable();
+                this._rotateOnMouseDownTouchStartEnable();
             }
         } else {
             if (!this.walkerTouchControls) {
@@ -178,7 +186,7 @@ class Controls {
             this._removeKeyboardListeners();
             this._removePointerLock();
             if (this.rotateOnMouseDown) {
-                this._rotateOnMouseDownDisable();
+                this._rotateOnMouseDownTouchStartDisable();
             }
         } else {
             this.walkerTouchControls.disable();
@@ -365,23 +373,38 @@ class Controls {
         }
     }
 
-    _rotateOnMouseDownEnable() {
-        this.domElement.addEventListener('mousedown', this._enableWalkerRotation);
-        this.domElement.addEventListener('mouseup', this._disableWalkerRotation);
-        this.domElement.addEventListener('mouseout', this._disableWalkerRotation);
-        this.domElement.addEventListener('mousemove', this._preventDefault);
+    _rotateOnMouseDownTouchStartEnable() {
+        this.domElement.addEventListener('mousedown', this._onMousePressTouchStart, false);
+        this.domElement.addEventListener('mouseup', this._onMouseReleaseTouchEnd, false);
+        this.domElement.addEventListener('mouseout', this._onMouseReleaseTouchEnd, false);
+
+        this.domElement.addEventListener('touchstart', this._onMousePressTouchStart, false);
+        this.domElement.addEventListener('touchend', this._onMouseReleaseTouchEnd, false);
+        this.domElement.addEventListener('touchcancel', this._onMouseReleaseTouchEnd, false);
     }
 
-    _rotateOnMouseDownDisable() {
-        this.domElement.removeEventListener('mousedown', this._enableWalkerRotation);
-        this.domElement.removeEventListener('mouseup', this._disableWalkerRotation);
-        this.domElement.removeEventListener('mouseout', this._disableWalkerRotation);
-        this.domElement.removeEventListener('mousemove', this._preventDefault);
+    _rotateOnMouseDownTouchStartDisable() {
+        this.domElement.removeEventListener('mousedown', this._onMousePressTouchStart, false);
+        this.domElement.removeEventListener('mouseup', this._onMouseReleaseTouchEnd, false);
+        this.domElement.removeEventListener('mouseout', this._onMouseReleaseTouchEnd, false);
+
+        this.domElement.removeEventListener('touchstart', this._onMousePressTouchStart, false);
+        this.domElement.removeEventListener('touchend', this._onMouseReleaseTouchEnd, false);
+        this.domElement.removeEventListener('touchcancel', this._onMouseReleaseTouchEnd, false);
     }
 
-    _enableWalkerRotation() { self.walkerControls.enabled = true; }
-    _disableWalkerRotation() { self.walkerControls.enabled = false; }
-    _preventDefault(e) { e.preventDefault(); }
+    _onMousePressTouchStart(e) {
+        e.preventDefault();
+        if (e.changedTouches && e.changedTouches.length && !self.walkerControls.enabled) {
+            self.walkerControls.touchId = e.changedTouches[0].identifier;
+            self.walkerControls.touchLastPos.x = e.changedTouches[0].clientX;
+            self.walkerControls.touchLastPos.y = e.changedTouches[0].clientY;
+        }
+        self.walkerControls.enabled = true;
+    }
+    _onMouseReleaseTouchEnd() {
+        self.walkerControls.enabled = false;
+    }
 
     _pointerlockchange() {
         const element = document.body;
@@ -415,7 +438,6 @@ class Controls {
             element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock
             || element.webkitRequestPointerLock;
             element.requestPointerLock();
-
             success = true;
         }
         return success;
