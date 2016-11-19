@@ -10,6 +10,7 @@ import WalkerTouchControls from './walkerTouchControls.js';
 
 const disableWalkerEvent = new Event('disableWalker');
 
+let self;
 const v = {
     height: 1.6,
     moveForward: false,
@@ -61,6 +62,9 @@ const onKeyDown = function(e) {
     case 32: // space
         v.jump = true;
         break;
+    case 27: // escape
+        if (!this.orbitControls.enabled) this.disableWalker();
+        break;
     default:
     }
 };
@@ -95,10 +99,13 @@ const onKeyUp = function(e) {
 
 class Controls {
     constructor(camera, domElement, scene) {
+        self = this;
+
         this.camera = camera;
         this.domElement = domElement;
         this.walkerEnabled = false;
         this.isDesktop = device.desktop();
+        this.rotateOnMouseDown = false;
 
         this.walkerTouchControls = null;
 
@@ -128,6 +135,9 @@ class Controls {
         this.resetCameraOrbit();
 
         this.navMesh = new THREE.Group();
+
+        this.onKeyDown = onKeyDown.bind(this);
+        this.onKeyUp = onKeyUp.bind(this);
     }
 
     enableWalker(dungeon) {
@@ -140,9 +150,13 @@ class Controls {
         this._controlsObject.rotation.y = 0; // Rotates Yaw Object
         this._controlsObject.children[0].rotation.x = 0; // Rotates Pitch Object
 
+        this.rotateOnMouseDown = false;
         if (this.isDesktop) {
             this._addKeyboardListeners();
-            this._preparePointerLock();
+            if (!this._preparePointerLock()) { // safari couldn't lock the pointer
+                this.rotateOnMouseDown = true;
+                this._rotateOnMouseDownEnable();
+            }
         } else {
             if (!this.walkerTouchControls) {
                 this.walkerTouchControls = new WalkerTouchControls(v, config);
@@ -154,7 +168,7 @@ class Controls {
         document.body.appendChild(this.infoEl);
 
         this.orbitControls.enabled = false;
-        this.walkerControls.enabled = true;
+        this.walkerControls.enabled = !this.rotateOnMouseDown;
     }
 
     disableWalker() {
@@ -163,6 +177,9 @@ class Controls {
         if (this.isDesktop) {
             this._removeKeyboardListeners();
             this._removePointerLock();
+            if (this.rotateOnMouseDown) {
+                this._rotateOnMouseDownDisable();
+            }
         } else {
             this.walkerTouchControls.disable();
         }
@@ -348,6 +365,24 @@ class Controls {
         }
     }
 
+    _rotateOnMouseDownEnable() {
+        this.domElement.addEventListener('mousedown', this._enableWalkerRotation);
+        this.domElement.addEventListener('mouseup', this._disableWalkerRotation);
+        this.domElement.addEventListener('mouseout', this._disableWalkerRotation);
+        this.domElement.addEventListener('mousemove', this._preventDefault);
+    }
+
+    _rotateOnMouseDownDisable() {
+        this.domElement.removeEventListener('mousedown', this._enableWalkerRotation);
+        this.domElement.removeEventListener('mouseup', this._disableWalkerRotation);
+        this.domElement.removeEventListener('mouseout', this._disableWalkerRotation);
+        this.domElement.removeEventListener('mousemove', this._preventDefault);
+    }
+
+    _enableWalkerRotation() { self.walkerControls.enabled = true; }
+    _disableWalkerRotation() { self.walkerControls.enabled = false; }
+    _preventDefault(e) { e.preventDefault(); }
+
     _pointerlockchange() {
         const element = document.body;
         if (document.pointerLockElement === element ||
@@ -355,7 +390,7 @@ class Controls {
         document.webkitPointerLockElement === element) {
             // self.walkerControls.enabled = true;
         } else {
-            this.disableWalker();
+            if (!self.orbitControls.enabled) self.disableWalker();
         }
     }
 
@@ -369,9 +404,9 @@ class Controls {
         let success = false;
         if ('pointerLockElement' in document || 'mozPointerLockElement' in document ||
              'webkitPointerLockElement' in document) {
-            document.addEventListener('pointerlockchange', this._pointerlockchange.bind(this), false);
-            document.addEventListener('mozpointerlockchange', this._pointerlockchange.bind(this), false);
-            document.addEventListener('webkitpointerlockchange', this._pointerlockchange.bind(this), false);
+            document.addEventListener('pointerlockchange', this._pointerlockchange, false);
+            document.addEventListener('mozpointerlockchange', this._pointerlockchange, false);
+            document.addEventListener('webkitpointerlockchange', this._pointerlockchange, false);
 
             document.addEventListener('pointerlockerror', this._pointerlockerror, false);
             document.addEventListener('mozpointerlockerror', this._pointerlockerror, false);
@@ -382,17 +417,14 @@ class Controls {
             element.requestPointerLock();
 
             success = true;
-        } else {
-            element.innerHTML = 'Bad browser; No pointer lock';
         }
-        // element.innerHTML = 'Bad browser; No pointer lock';
         return success;
     }
 
     _removePointerLock() {
-        document.removeEventListener('pointerlockchange', this._pointerlockchange.bind(this), false);
-        document.removeEventListener('mozpointerlockchange', this._pointerlockchange.bind(this), false);
-        document.removeEventListener('webkitpointerlockchange', this._pointerlockchange.bind(this), false);
+        document.removeEventListener('pointerlockchange', this._pointerlockchange, false);
+        document.removeEventListener('mozpointerlockchange', this._pointerlockchange, false);
+        document.removeEventListener('webkitpointerlockchange', this._pointerlockchange, false);
 
         document.removeEventListener('pointerlockerror', this._pointerlockerror, false);
         document.removeEventListener('mozpointerlockerror', this._pointerlockerror, false);
@@ -400,13 +432,13 @@ class Controls {
     }
 
     _addKeyboardListeners() {
-        document.addEventListener('keydown', onKeyDown, false);
-        document.addEventListener('keyup', onKeyUp, false);
+        document.addEventListener('keydown', this.onKeyDown, false);
+        document.addEventListener('keyup', this.onKeyUp, false);
     }
 
     _removeKeyboardListeners() {
-        document.removeEventListener('keydown', onKeyDown, false);
-        document.removeEventListener('keyup', onKeyUp, false);
+        document.removeEventListener('keydown', this.onKeyDown, false);
+        document.removeEventListener('keyup', this.onKeyUp, false);
     }
 
     dispose() {
