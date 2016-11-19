@@ -2,8 +2,6 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-const THREE = require('three');
-
 THREE.PointerLockControls = function(camera, domElement, isDesktop) {
     const scope = this;
 
