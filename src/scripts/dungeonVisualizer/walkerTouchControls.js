@@ -20,6 +20,7 @@ class WalkerTouchControls {
             if (!Number.isInteger(this.moveTouchId)) {
                 this.moveTouchId = e.changedTouches[0].identifier;
                 this._onMoveTouchChange(e.changedTouches[0]);
+                this._back.style.opacity = '0.8';
             }
         });
 
@@ -75,6 +76,7 @@ class WalkerTouchControls {
         for (let i = 0; i < e.changedTouches.length; i++) {
             if (e.changedTouches[i].identifier === this.moveTouchId) {
                 this.moveTouchId = null;
+                this._back.style.opacity = '0.6';
                 this.walkerVars.moveForward = false;
                 this.walkerVars.moveBackward = false;
                 this.walkerVars.moveRight = false;
@@ -199,14 +201,17 @@ class WalkerTouchControls {
         back.style.width = '100%';
         back.style.height = '100%';
         back.style.display = 'table';
-        back.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        back.style.backgroundColor = '#333333';
+        back.style.opacity = '0.6';
         back.style.borderRadius = '50%';
 
         front.style.width = '50%';
         front.style.height = '50%';
         front.style.display = 'table';
-        front.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        front.style.backgroundColor = '#000000';
         front.style.borderRadius = '50%';
+        front.style.borderStyle = 'dashed';
+        front.style.borderColor = 'white';
 
         lookJoystickCont.style.height = '80%';
         lookJoystickCont.style.position = 'absolute';

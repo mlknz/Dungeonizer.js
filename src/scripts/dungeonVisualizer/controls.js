@@ -291,7 +291,7 @@ class Controls {
                     cObj.position.copy(prevPos);
                 }
 
-                // TODO: should work without it (but it doesn't... yet)
+                // TODO: should work without it (but it doesn't)
                 v.raycaster.ray.origin.copy(cObj.position);
                 intersections = [];
                 intersections = v.raycaster.intersectObjects(this.navMesh.children, false);
@@ -366,6 +366,7 @@ class Controls {
 
     _preparePointerLock() {
         const element = document.body;
+        let success = false;
         if ('pointerLockElement' in document || 'mozPointerLockElement' in document ||
              'webkitPointerLockElement' in document) {
             document.addEventListener('pointerlockchange', this._pointerlockchange.bind(this), false);
@@ -379,9 +380,13 @@ class Controls {
             element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock
             || element.webkitRequestPointerLock;
             element.requestPointerLock();
+
+            success = true;
         } else {
             element.innerHTML = 'Bad browser; No pointer lock';
         }
+        // element.innerHTML = 'Bad browser; No pointer lock';
+        return success;
     }
 
     _removePointerLock() {
