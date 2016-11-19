@@ -38,7 +38,9 @@ const config = {
         trashFloorY: -0.9,
 
         tunnelDebugHeight: 1.2,
-        tunnelDebugColor: [0.7, 0.7, 0.7]
+        tunnelDebugColor: [0.7, 0.7, 0.7],
+
+        joystickReturnSpeed: 15
     }
 };
 
