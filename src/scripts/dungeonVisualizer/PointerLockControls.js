@@ -22,14 +22,17 @@ THREE.PointerLockControls = function(camera, domElement) {
 
         if (scope.enabled === false) return;
 
-        const newX = event.clientX;
-        const newY = event.clientY;
+        let dx = 0;
+        let dy = 0;
+        if (scope.mouseLastPos.x || scope.mouseLastPos.y) {
+            dx = event.clientX - scope.mouseLastPos.x;
+            dy = event.clientY - scope.mouseLastPos.y;
+            scope.mouseLastPos.x = event.clientX;
+            scope.mouseLastPos.y = event.clientY;
+        }
 
-        const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || newX - scope.mouseLastPos.x || 0;
-        const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || newY - scope.mouseLastPos.y || 0;
-
-        scope.mouseLastPos.x = newX;
-        scope.mouseLastPos.y = newY;
+        const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || dx;
+        const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || dy;
 
         yawObject.rotation.y -= movementX * 0.002;
         pitchObject.rotation.x -= movementY * 0.002;
@@ -58,12 +61,10 @@ THREE.PointerLockControls = function(camera, domElement) {
     }; */
 
     this.dispose = function() {
-        // this.domElement.removeEventListener('mousemove', onMouseMove, false);
         document.removeEventListener('mousemove', onMouseMove, false);
         // this.domElement.removeEventListener('touchmove', onTouchMove, false); // in case you need such controls on touch device
     };
 
-    // this.domElement.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('mousemove', onMouseMove, false);
     // this.domElement.addEventListener('touchmove', onTouchMove, false); // in case you need such controls on touch device
 
