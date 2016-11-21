@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.PointerLockControls = function(camera, domElement, isDesktop) {
+THREE.PointerLockControls = function(camera, domElement) {
     const scope = this;
 
     scope.domElement = (domElement !== undefined) ? domElement : document;
@@ -22,8 +22,14 @@ THREE.PointerLockControls = function(camera, domElement, isDesktop) {
 
         if (scope.enabled === false) return;
 
-        const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-        const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+        const newX = event.clientX;
+        const newY = event.clientY;
+
+        const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || newX - scope.mouseLastPos.x || 0;
+        const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || newY - scope.mouseLastPos.y || 0;
+
+        scope.mouseLastPos.x = newX;
+        scope.mouseLastPos.y = newY;
 
         yawObject.rotation.y -= movementX * 0.002;
         pitchObject.rotation.x -= movementY * 0.002;
@@ -31,10 +37,11 @@ THREE.PointerLockControls = function(camera, domElement, isDesktop) {
         pitchObject.rotation.x = Math.max(- PI_2, Math.min(PI_2, pitchObject.rotation.x));
     };
 
-    const onTouchMove = function(event) {
+    // in case you need such controls on touch device
+    /* const onTouchMove = function(event) {
 
         if (scope.enabled === false) return;
-
+        console.log('doing it touch');
         const newX = event.changedTouches[0].clientX;
         const newY = event.changedTouches[0].clientY;
 
@@ -48,21 +55,22 @@ THREE.PointerLockControls = function(camera, domElement, isDesktop) {
         pitchObject.rotation.x -= movementY * 0.002;
 
         pitchObject.rotation.x = Math.max(-PI_2, Math.min(PI_2, pitchObject.rotation.x));
-    };
+    }; */
 
     this.dispose = function() {
         // this.domElement.removeEventListener('mousemove', onMouseMove, false);
         document.removeEventListener('mousemove', onMouseMove, false);
-        if (isDesktop) this.domElement.removeEventListener('touchmove', onTouchMove, false);
+        // this.domElement.removeEventListener('touchmove', onTouchMove, false); // in case you need such controls on touch device
     };
 
     // this.domElement.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('mousemove', onMouseMove, false);
-    if (isDesktop) this.domElement.addEventListener('touchmove', onTouchMove, false);
+    // this.domElement.addEventListener('touchmove', onTouchMove, false); // in case you need such controls on touch device
 
     this.enabled = false;
     this.touchId = null;
     this.touchLastPos = {x: null, y: null};
+    this.mouseLastPos = {x: null, y: null};
 
     this.getObject = function() {
         return yawObject;

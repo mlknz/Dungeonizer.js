@@ -2,7 +2,7 @@ window.THREE = THREE;
 
 require('three/examples/js/controls/OrbitControls.js');
 // require('three/examples/js/controls/PointerLockControls');
-require('./PointerLockControls.js'); // with touchmove support for trackpad / touchpad
+require('./PointerLockControls.js'); // with touchmove and mac trackpad support
 
 const device = require('device.js')();
 
@@ -135,7 +135,7 @@ class Controls {
             this.infoEl.innerHTML = 'Controls: WASD / Space / Shift + mouse. Press Escape to exit.';
         }
 
-        this.walkerControls = new THREE.PointerLockControls(camera, domElement, this.isDesktop);
+        this.walkerControls = new THREE.PointerLockControls(camera, domElement);
         this._controlsObject = this.walkerControls.getObject();
         this._controlsObject.name = 'pointerLockObject';
         scene.add(this._controlsObject);
@@ -163,7 +163,7 @@ class Controls {
             this._addKeyboardListeners();
             if (!this._preparePointerLock()) { // safari couldn't lock the pointer
                 this.rotateOnMouseDown = true;
-                this._rotateOnMouseDownTouchStartEnable();
+                this._rotateOnMouseDownEnable();
             }
         } else {
             if (!this.walkerTouchControls) {
@@ -186,7 +186,7 @@ class Controls {
             this._removeKeyboardListeners();
             this._removePointerLock();
             if (this.rotateOnMouseDown) {
-                this._rotateOnMouseDownTouchStartDisable();
+                this._rotateOnMouseDownDisable();
             }
         } else {
             this.walkerTouchControls.disable();
@@ -373,32 +373,28 @@ class Controls {
         }
     }
 
-    _rotateOnMouseDownTouchStartEnable() {
+    _rotateOnMouseDownEnable() {
         this.domElement.addEventListener('mousedown', this._onMousePressTouchStart, false);
         this.domElement.addEventListener('mouseup', this._onMouseReleaseTouchEnd, false);
         this.domElement.addEventListener('mouseout', this._onMouseReleaseTouchEnd, false);
-
-        this.domElement.addEventListener('touchstart', this._onMousePressTouchStart, false);
-        this.domElement.addEventListener('touchend', this._onMouseReleaseTouchEnd, false);
-        this.domElement.addEventListener('touchcancel', this._onMouseReleaseTouchEnd, false);
     }
 
-    _rotateOnMouseDownTouchStartDisable() {
+    _rotateOnMouseDownDisable() {
         this.domElement.removeEventListener('mousedown', this._onMousePressTouchStart, false);
         this.domElement.removeEventListener('mouseup', this._onMouseReleaseTouchEnd, false);
         this.domElement.removeEventListener('mouseout', this._onMouseReleaseTouchEnd, false);
-
-        this.domElement.removeEventListener('touchstart', this._onMousePressTouchStart, false);
-        this.domElement.removeEventListener('touchend', this._onMouseReleaseTouchEnd, false);
-        this.domElement.removeEventListener('touchcancel', this._onMouseReleaseTouchEnd, false);
     }
 
     _onMousePressTouchStart(e) {
         e.preventDefault();
         if (e.changedTouches && e.changedTouches.length && !self.walkerControls.enabled) {
-            self.walkerControls.touchId = e.changedTouches[0].identifier;
-            self.walkerControls.touchLastPos.x = e.changedTouches[0].clientX;
-            self.walkerControls.touchLastPos.y = e.changedTouches[0].clientY;
+            // disabled path for touch devices
+            // self.walkerControls.touchId = e.changedTouches[0].identifier;
+            // self.walkerControls.touchLastPos.x = e.changedTouches[0].clientX;
+            // self.walkerControls.touchLastPos.y = e.changedTouches[0].clientY;
+        } else {
+            self.walkerControls.mouseLastPos.x = e.clientX;
+            self.walkerControls.mouseLastPos.y = e.clientY;
         }
         self.walkerControls.enabled = true;
     }
