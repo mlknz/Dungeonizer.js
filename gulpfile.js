@@ -74,6 +74,14 @@ gulp.task('static', () => {
     }).pipe(gulp.dest('dist'));
 });
 
+gulp.task('assets', () => {
+    return gulp.src([
+        'src/**/*.ico'
+    ], {
+        dot: true
+    }).pipe(gulp.dest('dist'));
+});
+
 gulp.task('libs', () => {
     gulp.src('node_modules/three/build/three.min.js')
         .pipe(gulp.dest('dist/libs'));
@@ -83,7 +91,7 @@ gulp.task('libs', () => {
 
 gulp.task('webpack:prod', cb => webpackTask(cb, {prod: true}));
 
-gulp.task('build', ['clean', 'libs', 'static', 'webpack:prod']);
+gulp.task('build', ['clean', 'libs', 'static', 'assets', 'webpack:prod']);
 
 gulp.task('watch', cb => webpackTask(cb, {watch: true}));
 
