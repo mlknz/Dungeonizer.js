@@ -7,15 +7,15 @@ import floorsFrag from './shaders/floors.frag';
 class Tunnels {
     // under assumption x1 <= x2 and y1 <= y2 for tunnels
     constructor(tunnels, {isDebug, config, isWall}) {
-        const offsets = [];
-        const scales = [];
-        const colors = [];
+        const offsets = new Array(tunnels.length * 3 / 4);
+        const scales = new Array(tunnels.length * 3 / 4);
+        const colors = new Array(tunnels.length * 3 / 4);
 
         const c = isWall ? config.wallColor : isDebug ? config.tunnelDebugColor : config.floorTunnelColor;
         const h = isWall ? config.wallHeight : isDebug ? config.tunnelDebugHeight : config.tunnelHeight;
         const hOffset = isWall ? h / 2 - 0.5 : 0;
 
-        let isHorizontal, x, y, xS, yS;
+        let isHorizontal, debugWallColor, x, y, xS, yS;
 
         for (let i = 0; i < tunnels.length; i += 4) {
             isHorizontal = tunnels[i + 2] - tunnels[i] > tunnels[i + 3] - tunnels[i + 1];
@@ -28,7 +28,7 @@ class Tunnels {
 
             offsets.push(x, hOffset, y);
             scales.push(xS, h, yS);
-            const debugWallColor = [
+            debugWallColor = [
                 Math.abs(Math.sin(157.21355 * x)),
                 Math.abs(Math.sin(157.21355 * x * y)) / 3,
                 Math.abs(Math.sin(157.21355 * y))

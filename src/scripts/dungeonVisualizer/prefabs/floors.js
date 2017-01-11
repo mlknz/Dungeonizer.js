@@ -3,9 +3,9 @@ import floorsFrag from './shaders/floors.frag';
 
 class Floors {
     constructor(floors, {isDebug, isTrashFloors, config}) {
-        const offsets = [];
-        const scales = [];
-        const colors = [];
+        const offsets = new Array(floors.length * 3);
+        const scales = new Array(floors.length * 3);
+        const colors = new Array(floors.length * 3);
 
         const mainFloorColor = isDebug ? config.mainFloorDebugColor : config.floorTunnelColor;
         const attachedFloorColor = config.attachedFloorDebugColor;
